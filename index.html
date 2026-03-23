@@ -576,32 +576,37 @@
         const multRef = document.getElementById('chkRefine').checked ? 1.03 : 1;
         const multMast = document.getElementById('chkMastery').checked ? 1.06 : 1;
 
+        // Baking Steel
         const reqGrainSteelToBake = Math.ceil(desiredSteel / (0.7 * multRef));
         const coalForSteel = Math.ceil(reqGrainSteelToBake * 0.5);
         const saburraPowderForSteel = Math.ceil(reqGrainSteelToBake * 0.5);
 
         const grainSteelToCraft = Math.max(0, reqGrainSteelToBake - bGrainSteel);
 
+        // Baking Grain Steel
         const reqPigIronToBake = Math.ceil(grainSteelToCraft / (0.7 * multRef));
         const cokeForGS = Math.ceil(reqPigIronToBake * 0.5);
         const calxPowderForGS = Math.ceil(reqPigIronToBake * 0.5);
 
         const pigIronToCraft = Math.max(0, reqPigIronToBake - bPigIron);
 
+        // Smelting Pig Iron
         const reqBloodOreToSmelt = Math.ceil(pigIronToCraft / (0.4 * multRef));
-        const cokeForPI = Math.ceil(reqBloodOreToSmelt * (792/19800));
+        const cokeForPI = Math.ceil(reqBloodOreToSmelt * 0.0385);
 
         const totalCokeNeeded = cokeForGS + cokeForPI;
         const cokeToCraft = Math.max(0, totalCokeNeeded - bCoke);
 
+        // Furnacing Coke
         const coalForCoke = Math.ceil(cokeToCraft / (0.72 * multRef));
-        const calxPowderForCoke = Math.ceil(cokeToCraft * (80/792));
+        const calxPowderForCoke = Math.ceil(coalForCoke * 0.0715);
 
         const totalCoalNeeded = coalForSteel + coalForCoke;
         const coalToCraft = Math.max(0, totalCoalNeeded - bCoal);
 
+        // Attracting Blood Ore
         const reqGranum = Math.ceil(reqBloodOreToSmelt / (0.198 * multExt * multMast));
-        const calxPowderForBloodOre = Math.ceil(reqGranum * 0.072);
+        const calxPowderForBloodOre = Math.ceil(reqGranum * 0.0715);
 
         const totalCalxPowderNeeded = calxPowderForGS + calxPowderForCoke + calxPowderForBloodOre;
         const calxPowderToCraft = Math.max(0, totalCalxPowderNeeded - bCalxPowder);
@@ -609,16 +614,19 @@
         const totalSaburraPowderNeeded = saburraPowderForSteel;
         const saburraPowderToCraft = Math.max(0, totalSaburraPowderNeeded - bSabPowder);
 
-        const reqSaburra = Math.ceil(saburraPowderToCraft / ((5002/11700) * multExt));
-        const waterForSaburra = Math.ceil(reqSaburra * (1053/11700));
+        // Grinding Saburra
+        const reqSaburra = Math.ceil(saburraPowderToCraft / (0.4275 * multExt));
+        const waterForSaburra = Math.ceil(reqSaburra * 0.10);
 
-        const calxToGrind = Math.ceil(calxPowderToCraft / ((7286/35400) * multExt));
-        const waterForCalx = Math.ceil(calxToGrind * (3500/35400));
+        // Grinding Calx
+        const calxToGrind = Math.ceil(calxPowderToCraft / (0.2058 * multExt));
+        const waterForCalx = Math.ceil(calxToGrind * 0.10);
         
-        const coalFromGrinding = Math.ceil(calxToGrind * (4036/35400) * multExt);
+        const coalFromGrinding = Math.ceil(calxToGrind * 0.1140 * multExt);
         const extraCoalNeeded = Math.max(0, coalToCraft - coalFromGrinding);
         
-        const calxToCrush = Math.ceil(extraCoalNeeded / ((2096/9600) * multExt));
+        // Crushing Calx
+        const calxToCrush = Math.ceil(extraCoalNeeded / (0.2160 * multExt));
         
         const reqCalx = calxToGrind + calxToCrush;
         const reqWater = waterForSaburra + waterForCalx;
@@ -649,9 +657,8 @@
             let mid = Math.floor((low + high) / 2);
             let c = getCalculations(mid);
             
-            // Fix: The limiting factor for crafting Steel is strictly the Metal pipeline.
+            // The limiting factor for crafting Steel is strictly the Metal pipeline.
             // All metal shortfalls (Grain Steel -> Pig Iron -> Blood Ore) cascade down to Granum.
-            // If defGranum === 0, it means our total banked metal can cover this amount of Steel.
             if (c.defGranum === 0) {
                 maxSteel = mid;
                 low = mid + 1;
@@ -728,7 +735,7 @@
             </div>
         `;
 
-        // DYNAMIC STEPS LOGIC (This dynamically numbers 1, 2, 3...)
+        // DYNAMIC STEPS LOGIC 
         const split = (val) => Math.ceil(val / crafters).toLocaleString();
         const crftTag = crafters > 1 ? `<span style="color:var(--warning); font-size:0.9em;">${t.perCrafter}</span>` : '';
         let stepsHTML = '';
@@ -763,7 +770,9 @@
                 stepsHTML += `<div class="step-card"><strong>${t.step} ${stepNum} ${crftTag}:</strong> ${t.oven}: <span class="highlight">${split(c.pigIronToCraft)} ${t.pigIron}</span> + <span class="highlight">${split(c.cokeForGS)} ${t.coke}</span> + <span class="highlight">${split(c.calxPowderForGS)} ${t.calxPowder}</span> &#8594; ${t.yields} ${split(c.grainSteelToCraft)} ${t.grainSteel}</div>`;
                 stepNum++;
             }
-            stepsHTML += `<div class="step-card"><strong>${t.step} ${stepNum} ${crftTag}:</strong> ${t.oven}: <span class="highlight">${split(c.reqGrainSteelToBake)} ${t.grainSteel}</span> + <span class="highlight">${split(c.coalForSteel)} ${t.coal}</span> + <span class="highlight">${split(c.saburraPowderForSteel)} ${t.sabPowder}</span> &#8594; ${t.yields} ${split(desiredSteel)} ${t.steel}</div>`;
+            if (c.reqGrainSteelToBake > 0) {
+                stepsHTML += `<div class="step-card"><strong>${t.step} ${stepNum} ${crftTag}:</strong> ${t.oven}: <span class="highlight">${split(c.reqGrainSteelToBake)} ${t.grainSteel}</span> + <span class="highlight">${split(c.coalForSteel)} ${t.coal}</span> + <span class="highlight">${split(c.saburraPowderForSteel)} ${t.sabPowder}</span> &#8594; ${t.yields} ${split(desiredSteel)} ${t.steel}</div>`;
+            }
         }
         
         document.getElementById('stepList').innerHTML = stepsHTML;
@@ -797,7 +806,7 @@
             if (d.cokeToCraft > 0) { msg += `**${dStepNum}.** Furnace: ${s(d.coalForCoke)} Coal + ${s(d.calxPowderForCoke)} Calx Pwdr\n`; dStepNum++; }
             if (d.pigIronToCraft > 0) { msg += `**${dStepNum}.** Furnace: ${s(d.reqBloodOreToSmelt)} Blood Ore + ${s(d.cokeForPI)} Coke\n`; dStepNum++; }
             if (d.grainSteelToCraft > 0) { msg += `**${dStepNum}.** Oven: ${s(d.pigIronToCraft)} Pig Iron + ${s(d.cokeForGS)} Coke + ${s(d.calxPowderForGS)} Calx Pwdr\n`; dStepNum++; }
-            msg += `**${dStepNum}.** Oven: ${s(d.reqGrainSteelToBake)} Grain Steel + ${s(d.coalForSteel)} Coal + ${s(d.saburraPowderForSteel)} Saburra Pwdr\n`;
+            if (d.reqGrainSteelToBake > 0) { msg += `**${dStepNum}.** Oven: ${s(d.reqGrainSteelToBake)} Grain Steel + ${s(d.coalForSteel)} Coal + ${s(d.saburraPowderForSteel)} Saburra Pwdr\n`; }
         }
 
         navigator.clipboard.writeText(msg).then(() => {
