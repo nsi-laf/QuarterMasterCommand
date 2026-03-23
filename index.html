@@ -426,7 +426,7 @@
             pigIron: "Pig Iron", grainSteel: "Grain Steel", steel: "Steel", gold: "g",
             grind: "Grind", crush: "Crush", attractor: "Attractor", furnace: "Furnace", oven: "Refining Oven",
             yields: "Yields", and: "&", req: "Req", bank: "Bank", def: "Gather", perCrafter: "(Per Crafter)",
-            copied: "✅ Copied!", noMats: "✅ You have all the raw materials needed!"
+            copied: "✅ Copied!", noMats: "✅ You have all the raw materials needed!", awaiting: "Enter a Target Yield or press ⚡ Max..."
         },
         fr: {
             title: "Suite Logistique d'Acier", input: "Objectif de production :", display: "Format d'Affichage :",
@@ -440,7 +440,7 @@
             pigIron: "Pig Iron", grainSteel: "Grain Steel", steel: "Steel", gold: "g",
             grind: "Broyer", crush: "Concasser", attractor: "Attracteur", furnace: "Fourneau", oven: "Four de Raffinage",
             yields: "Produit", and: "et", req: "Req", bank: "Banque", def: "À Récolter", perCrafter: "(Par Artisan)", 
-            copied: "✅ Copié !", noMats: "✅ Vous avez toutes les matières premières nécessaires !"
+            copied: "✅ Copié !", noMats: "✅ Vous avez toutes les matières premières nécessaires !", awaiting: "Entrez un objectif ou appuyez sur ⚡ Max..."
         },
         es: {
             title: "Suite de Logística de Acero", input: "Rendimiento Objetivo:", display: "Formato:",
@@ -454,7 +454,7 @@
             pigIron: "Pig Iron", grainSteel: "Grain Steel", steel: "Steel", gold: "g",
             grind: "Moler", crush: "Triturar", attractor: "Atractor", furnace: "Horno", oven: "Horno Refin.",
             yields: "Produce", and: "y", req: "Req", bank: "Banco", def: "Recolectar", perCrafter: "(Por Artesano)", 
-            copied: "✅ Copiado!", noMats: "✅ ¡Tienes todas las materias primas necesarias!"
+            copied: "✅ Copiado!", noMats: "✅ ¡Tienes todas las materias primas necesarias!", awaiting: "Ingrese un rendimiento o presione ⚡ Max..."
         },
         pt: {
             title: "Suite de Logística de Aço", input: "Rendimento Alvo:", display: "Formato:",
@@ -468,7 +468,7 @@
             pigIron: "Pig Iron", grainSteel: "Grain Steel", steel: "Steel", gold: "g",
             grind: "Moer", crush: "Triturar", attractor: "Atrator", furnace: "Fornalha", oven: "Forno Refino",
             yields: "Produz", and: "e", req: "Req", bank: "Banco", def: "Coletar", perCrafter: "(Por Artesão)", 
-            copied: "✅ Copiado!", noMats: "✅ Você tem todas as matérias-primas necessárias!"
+            copied: "✅ Copiado!", noMats: "✅ Você tem todas as matérias-primas necessárias!", awaiting: "Insira um rendimento ou pressione ⚡ Max..."
         },
         de: {
             title: "Stahl-Logistik-Suite", input: "Ziel-Ertrag:", display: "Format:",
@@ -482,7 +482,7 @@
             pigIron: "Pig Iron", grainSteel: "Grain Steel", steel: "Steel", gold: "g",
             grind: "Mahlen", crush: "Zerkleinern", attractor: "Attraktor", furnace: "Ofen", oven: "Raffinierofen",
             yields: "Ergibt", and: "und", req: "Bedarf", bank: "Bank", def: "Sammeln", perCrafter: "(Pro Handwerker)", 
-            copied: "✅ Kopiert!", noMats: "✅ Du hast alle benötigten Rohstoffe!"
+            copied: "✅ Kopiert!", noMats: "✅ Du hast alle benötigten Rohstoffe!", awaiting: "Ziel-Ertrag eingeben oder ⚡ Max drücken..."
         }
     };
 
@@ -648,7 +648,11 @@
         while (low <= high) {
             let mid = Math.floor((low + high) / 2);
             let c = getCalculations(mid);
-            if (c.defGranum === 0 && c.defCalx === 0 && c.defSaburra === 0 && c.defWater === 0) {
+            
+            // Fix: The limiting factor for crafting Steel is strictly the Metal pipeline.
+            // All metal shortfalls (Grain Steel -> Pig Iron -> Blood Ore) cascade down to Granum.
+            // If defGranum === 0, it means our total banked metal can cover this amount of Steel.
+            if (c.defGranum === 0) {
                 maxSteel = mid;
                 low = mid + 1;
             } else {
@@ -667,7 +671,6 @@
         let desiredSteelInput = Number(document.getElementById('steelInput').value) || 0;
         let crafters = Math.max(1, parseInt(document.getElementById('crafterCount').value) || 1);
         
-        // Always calculate, even for zero, to clear UI properly
         const mode = document.getElementById('displayMode').value;
         const desiredSteel = mode === 'stacks' ? desiredSteelInput * 10000 : desiredSteelInput;
 
@@ -705,7 +708,9 @@
         if (c.reqSaburra > 0) { matsHTML += makeGridCol(t.saburra, c.reqSaburra, c.bSaburra, c.defSaburra); matCount++; }
         if (c.reqWater > 0) { matsHTML += makeGridCol(t.water, c.reqWater, c.bWater, c.defWater); matCount++; }
 
-        if (matCount === 0 || desiredSteel === 0) {
+        if (desiredSteel <= 0) {
+            matsHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-dim); font-style: italic; padding: 20px;">${t.awaiting}</div>`;
+        } else if (matCount === 0) {
             matsHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--success); font-weight: bold; padding: 20px;">${t.noMats}</div>`;
         }
         
@@ -723,7 +728,7 @@
             </div>
         `;
 
-        // DYNAMIC STEPS LOGIC
+        // DYNAMIC STEPS LOGIC (This dynamically numbers 1, 2, 3...)
         const split = (val) => Math.ceil(val / crafters).toLocaleString();
         const crftTag = crafters > 1 ? `<span style="color:var(--warning); font-size:0.9em;">${t.perCrafter}</span>` : '';
         let stepsHTML = '';
