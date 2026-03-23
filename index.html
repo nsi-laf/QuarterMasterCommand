@@ -181,7 +181,7 @@
             background-color: var(--bg-step);
             padding: 20px;
             border-radius: 8px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             border: 1px solid var(--border-color);
             transition: background-color 0.3s, border-color 0.3s;
             align-items: center;
@@ -208,6 +208,22 @@
             transition: background-color 0.3s, color 0.3s;
         }
         .gold-symbol { color: var(--accent); font-weight: bold; }
+
+        .intermediate-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            background-color: var(--bg-step);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+            align-items: center;
+        }
+        @media (max-width: 650px) {
+            .intermediate-grid { grid-template-columns: 1fr 1fr; }
+        }
 
         .summary-box {
             background-color: var(--bg-box);
@@ -331,7 +347,7 @@
         </label>
     </div>
 
-    <h2 id="marketTitle">Inventory & Market</h2>
+    <h2 id="marketTitle">Raw Materials Bank & Market</h2>
     <div class="inventory-grid">
         <div class="inv-header" id="hdrRes">Resource</div>
         <div class="inv-header" id="hdrPrice">Price (g/10k)</div>
@@ -354,7 +370,28 @@
         <div class="inv-cell"><input type="number" id="bankWater" class="bank-input" value="0" min="0" step="any" oninput="calculate()"><span class="inputSuffix2 text-dim"></span></div>
     </div>
 
-    <h2 id="rawTitle">Logistics: Materials to Gather</h2>
+    <h2 id="intBankTitle">Intermediate Components Bank</h2>
+    <div class="intermediate-grid">
+        <div class="inv-label">Saburra Powder</div>
+        <div class="inv-cell"><input type="number" id="bankSabPowder" class="bank-input" value="0" min="0" step="any" oninput="calculate()"><span class="inputSuffix2 text-dim"></span></div>
+        
+        <div class="inv-label">Calx Powder</div>
+        <div class="inv-cell"><input type="number" id="bankCalxPowder" class="bank-input" value="0" min="0" step="any" oninput="calculate()"><span class="inputSuffix2 text-dim"></span></div>
+        
+        <div class="inv-label">Coal</div>
+        <div class="inv-cell"><input type="number" id="bankCoal" class="bank-input" value="0" min="0" step="any" oninput="calculate()"><span class="inputSuffix2 text-dim"></span></div>
+        
+        <div class="inv-label">Coke</div>
+        <div class="inv-cell"><input type="number" id="bankCoke" class="bank-input" value="0" min="0" step="any" oninput="calculate()"><span class="inputSuffix2 text-dim"></span></div>
+        
+        <div class="inv-label">Pig Iron</div>
+        <div class="inv-cell"><input type="number" id="bankPigIron" class="bank-input" value="0" min="0" step="any" oninput="calculate()"><span class="inputSuffix2 text-dim"></span></div>
+        
+        <div class="inv-label">Grain Steel</div>
+        <div class="inv-cell"><input type="number" id="bankGrainSteel" class="bank-input" value="0" min="0" step="any" oninput="calculate()"><span class="inputSuffix2 text-dim"></span></div>
+    </div>
+
+    <h2 id="rawTitle">Logistics: Raw Materials to Gather</h2>
     <div class="summary-box" id="rawMaterials">
         </div>
     
@@ -380,8 +417,8 @@
             title: "Steel Logistics Suite", input: "Target Steel Yield:", display: "Input/Display Format:",
             crafterLabel: "Number of Crafters:", optUnits: "Units", optStacks: "Stacks (10k)", stackShort: "Stk",
             bonusTitle: "Yield Bonuses", lblMastery: "Ore Extraction Mastery (+6%)", lblExtract: "Extraction Bonus (+3%)", lblRefine: "Refining Bonus (+3%)",
-            marketTitle: "Inventory & Market", hdrRes: "Resource", hdrPrice: "Price (g/10k)", hdrBank: "In Bank",
-            rawTitle: "Logistics: Materials to Gather", totalCost: "Deficit Cost to Gather", costPerSteelStack: "Cost per Steel Stack",
+            marketTitle: "Raw Materials Bank & Market", intBankTitle: "Intermediate Components Bank", hdrRes: "Resource", hdrPrice: "Price (g/10k)", hdrBank: "In Bank",
+            rawTitle: "Logistics: Raw Materials to Gather", totalCost: "Deficit Cost to Gather", costPerSteelStack: "Cost per Steel Stack",
             stepsTitle: "Step-by-Step Instructions", btnDiscord: "📋 Copy for Discord", btnCsv: "📊 Export CSV",
             step: "Step", water: "Water", saburra: "Saburra", granum: "Granum", calx: "Calx",
             sabPowder: "Saburra Powder", calxPowder: "Calx Powder", coal: "Coal", bloodOre: "Blood Ore", coke: "Coke",
@@ -394,7 +431,7 @@
             title: "Suite Logistique d'Acier", input: "Objectif de production :", display: "Format d'Affichage :",
             crafterLabel: "Nombre d'Artisans :", optUnits: "Unités", optStacks: "Stacks (10k)", stackShort: "Stk",
             bonusTitle: "Bonus de Rendement", lblMastery: "Maîtrise d'Extraction (+6%)", lblExtract: "Bonus d'Extraction (+3%)", lblRefine: "Bonus de Raffinage (+3%)",
-            marketTitle: "Inventaire et Marché", hdrRes: "Ressource", hdrPrice: "Prix (g/10k)", hdrBank: "En Banque",
+            marketTitle: "Banque et Marché Brut", intBankTitle: "Banque de Composants", hdrRes: "Ressource", hdrPrice: "Prix (g/10k)", hdrBank: "En Banque",
             rawTitle: "Logistique : Matières à Récolter", totalCost: "Coût du Déficit", costPerSteelStack: "Coût par Stack d'Acier",
             stepsTitle: "Instructions Étape par Étape", btnDiscord: "📋 Copier pour Discord", btnCsv: "📊 Exporter CSV",
             step: "Étape", water: "Water", saburra: "Saburra", granum: "Granum", calx: "Calx",
@@ -408,7 +445,7 @@
             title: "Suite de Logística de Acero", input: "Rendimiento Objetivo:", display: "Formato:",
             crafterLabel: "Número de Artesanos:", optUnits: "Unidades", optStacks: "Stacks (10k)", stackShort: "Stk",
             bonusTitle: "Bonificaciones", lblMastery: "Maestría (+6%)", lblExtract: "Extracción (+3%)", lblRefine: "Refinación (+3%)",
-            marketTitle: "Inventario y Mercado", hdrRes: "Recurso", hdrPrice: "Precio (g/10k)", hdrBank: "En Banco",
+            marketTitle: "Banco y Mercado Bruto", intBankTitle: "Banco de Componentes", hdrRes: "Recurso", hdrPrice: "Precio (g/10k)", hdrBank: "En Banco",
             rawTitle: "Logística: Materiales a Recolectar", totalCost: "Costo del Déficit", costPerSteelStack: "Costo por Stack",
             stepsTitle: "Instrucciones", btnDiscord: "📋 Copiar para Discord", btnCsv: "📊 Exportar CSV",
             step: "Paso", water: "Water", saburra: "Saburra", granum: "Granum", calx: "Calx",
@@ -422,7 +459,7 @@
             title: "Suite de Logística de Aço", input: "Rendimento Alvo:", display: "Formato:",
             crafterLabel: "Número de Artesãos:", optUnits: "Unidades", optStacks: "Stacks (10k)", stackShort: "Stk",
             bonusTitle: "Bônus", lblMastery: "Maestria (+6%)", lblExtract: "Extração (+3%)", lblRefine: "Refino (+3%)",
-            marketTitle: "Inventário e Mercado", hdrRes: "Recurso", hdrPrice: "Preço (g/10k)", hdrBank: "No Banco",
+            marketTitle: "Banco e Mercado Bruto", intBankTitle: "Banco de Componentes", hdrRes: "Recurso", hdrPrice: "Preço (g/10k)", hdrBank: "No Banco",
             rawTitle: "Logística: Materiais a Coletar", totalCost: "Custo do Déficit", costPerSteelStack: "Custo por Stack",
             stepsTitle: "Instruções", btnDiscord: "📋 Copiar para Discord", btnCsv: "📊 Exportar CSV",
             step: "Passo", water: "Water", saburra: "Saburra", granum: "Granum", calx: "Calx",
@@ -436,7 +473,7 @@
             title: "Stahl-Logistik-Suite", input: "Ziel-Ertrag:", display: "Format:",
             crafterLabel: "Anzahl Handwerker:", optUnits: "Einheiten", optStacks: "Stacks (10k)", stackShort: "Stk",
             bonusTitle: "Boni", lblMastery: "Meisterschaft (+6%)", lblExtract: "Extraktion (+3%)", lblRefine: "Raffinierung (+3%)",
-            marketTitle: "Inventar & Markt", hdrRes: "Ressource", hdrPrice: "Preis (g/10k)", hdrBank: "Auf der Bank",
+            marketTitle: "Rohstoffbank & Markt", intBankTitle: "Komponentenbank", hdrRes: "Ressource", hdrPrice: "Preis (g/10k)", hdrBank: "Auf der Bank",
             rawTitle: "Logistik: Sammelbedarf", totalCost: "Defizitkosten", costPerSteelStack: "Kosten pro Stack",
             stepsTitle: "Anleitung", btnDiscord: "📋 Für Discord kopieren", btnCsv: "📊 CSV Exportieren",
             step: "Schritt", water: "Water", saburra: "Saburra", granum: "Granum", calx: "Calx",
@@ -467,6 +504,7 @@
         document.getElementById('lblExtract').innerText = t.lblExtract;
         document.getElementById('lblRefine').innerText = t.lblRefine;
         document.getElementById('marketTitle').innerText = t.marketTitle;
+        document.getElementById('intBankTitle').innerText = t.intBankTitle;
         document.getElementById('hdrRes').innerText = t.hdrRes;
         document.getElementById('hdrPrice').innerText = t.hdrPrice;
         document.getElementById('hdrBank').innerText = t.hdrBank;
@@ -492,7 +530,10 @@
 
     function handleModeChange() {
         const newMode = document.getElementById('displayMode').value;
-        const inputsToConvert = ['steelInput', 'bankGranum', 'bankCalx', 'bankSaburra', 'bankWater'];
+        const inputsToConvert = [
+            'steelInput', 'bankGranum', 'bankCalx', 'bankSaburra', 'bankWater', 
+            'bankSabPowder', 'bankCalxPowder', 'bankCoal', 'bankCoke', 'bankPigIron', 'bankGrainSteel'
+        ];
         
         inputsToConvert.forEach(id => {
             const el = document.getElementById(id);
@@ -522,57 +563,77 @@
         const mode = document.getElementById('displayMode').value;
         const desiredSteel = mode === 'stacks' ? desiredSteelInput * 10000 : desiredSteelInput;
 
-        // Market & Bank
         const pGranum = Number(document.getElementById('priceGranum').value) || 0;
         const pCalx = Number(document.getElementById('priceCalx').value) || 0;
         const pSaburra = Number(document.getElementById('priceSaburra').value) || 0;
         const pWater = Number(document.getElementById('priceWater').value) || 0;
 
         const getBank = (id) => mode === 'stacks' ? (Number(document.getElementById(id).value)||0) * 10000 : (Number(document.getElementById(id).value)||0);
+        
+        // Banks
         const bGranum = getBank('bankGranum');
         const bCalx = getBank('bankCalx');
         const bSaburra = getBank('bankSaburra');
         const bWater = getBank('bankWater');
+        const bSabPowder = getBank('bankSabPowder');
+        const bCalxPowder = getBank('bankCalxPowder');
+        const bCoal = getBank('bankCoal');
+        const bCoke = getBank('bankCoke');
+        const bPigIron = getBank('bankPigIron');
+        const bGrainSteel = getBank('bankGrainSteel');
 
         const t = text[currentLang];
 
-        // Yield Logic
         const multExt = document.getElementById('chkExtract').checked ? 1.03 : 1;
         const multRef = document.getElementById('chkRefine').checked ? 1.03 : 1;
         const multMast = document.getElementById('chkMastery').checked ? 1.06 : 1;
 
-        const grainSteel = Math.ceil(desiredSteel / (0.7 * multRef));
-        const coalForSteel = Math.ceil(grainSteel * 0.5);
-        const saburraPowder = Math.ceil(grainSteel * 0.5);
-        
-        const pigIron = Math.ceil(grainSteel / (0.7 * multRef));
-        const cokeForGS = Math.ceil(pigIron * 0.5);
-        const calxPowderForGS = Math.ceil(pigIron * 0.5);
-        
-        const bloodOre = Math.ceil(pigIron / (0.4 * multRef));
-        const cokeForPI = Math.ceil(bloodOre * (792/19800));
-        
-        const totalCoke = cokeForGS + cokeForPI;
-        const coalForCoke = Math.ceil(totalCoke / (0.72 * multRef));
-        const calxPowderForCoke = Math.ceil(totalCoke * (80/792));
-        
-        const totalCoal = coalForSteel + coalForCoke;
-        
-        const reqGranum = Math.ceil(bloodOre / (0.198 * multExt * multMast));
+        // Pipeline Logic
+        const reqGrainSteelToBake = Math.ceil(desiredSteel / (0.7 * multRef));
+        const coalForSteel = Math.ceil(reqGrainSteelToBake * 0.5);
+        const saburraPowderForSteel = Math.ceil(reqGrainSteelToBake * 0.5);
+
+        const grainSteelToCraft = Math.max(0, reqGrainSteelToBake - bGrainSteel);
+
+        const reqPigIronToBake = Math.ceil(grainSteelToCraft / (0.7 * multRef));
+        const cokeForGS = Math.ceil(reqPigIronToBake * 0.5);
+        const calxPowderForGS = Math.ceil(reqPigIronToBake * 0.5);
+
+        const pigIronToCraft = Math.max(0, reqPigIronToBake - bPigIron);
+
+        const reqBloodOreToSmelt = Math.ceil(pigIronToCraft / (0.4 * multRef));
+        const cokeForPI = Math.ceil(reqBloodOreToSmelt * (792/19800));
+
+        const totalCokeNeeded = cokeForGS + cokeForPI;
+        const cokeToCraft = Math.max(0, totalCokeNeeded - bCoke);
+
+        const coalForCoke = Math.ceil(cokeToCraft / (0.72 * multRef));
+        const calxPowderForCoke = Math.ceil(cokeToCraft * (80/792));
+
+        const totalCoalNeeded = coalForSteel + coalForCoke;
+        const coalToCraft = Math.max(0, totalCoalNeeded - bCoal);
+
+        const reqGranum = Math.ceil(reqBloodOreToSmelt / (0.198 * multExt * multMast));
         const calxPowderForBloodOre = Math.ceil(reqGranum * 0.072);
-        
-        const totalCalxPowder = calxPowderForGS + calxPowderForCoke + calxPowderForBloodOre;
-        
-        const reqSaburra = Math.ceil(saburraPowder / ((5002/11700) * multExt));
+
+        const totalCalxPowderNeeded = calxPowderForGS + calxPowderForCoke + calxPowderForBloodOre;
+        const calxPowderToCraft = Math.max(0, totalCalxPowderNeeded - bCalxPowder);
+
+        const totalSaburraPowderNeeded = saburraPowderForSteel;
+        const saburraPowderToCraft = Math.max(0, totalSaburraPowderNeeded - bSabPowder);
+
+        const reqSaburra = Math.ceil(saburraPowderToCraft / ((5002/11700) * multExt));
         const waterForSaburra = Math.ceil(reqSaburra * (1053/11700));
+
+        const calxToGrind = Math.ceil(calxPowderToCraft / ((7286/35400) * multExt));
+        const waterForCalx = Math.ceil(calxToGrind * (3500/35400));
         
-        const calxToGrind = Math.ceil(totalCalxPowder / ((7286/35400) * multExt));
         const coalFromGrinding = Math.ceil(calxToGrind * (4036/35400) * multExt);
-        const extraCoalNeeded = Math.max(0, totalCoal - coalFromGrinding);
+        const extraCoalNeeded = Math.max(0, coalToCraft - coalFromGrinding);
+        
         const calxToCrush = Math.ceil(extraCoalNeeded / ((2096/9600) * multExt));
         
         const reqCalx = calxToGrind + calxToCrush;
-        const waterForCalx = Math.ceil(calxToGrind * (3500/35400));
         const reqWater = waterForSaburra + waterForCalx;
 
         // Deficits
@@ -590,9 +651,15 @@
         const costPerSteelStack = (defCost / (desiredSteel / 10000));
 
         // Save data for Export/Discord
-        lastCalcData = { desiredSteel, crafters, defGranum, defCalx, defSaburra, defWater, defCost, reqGranum, reqCalx, reqSaburra, reqWater, saburraPowder, waterForSaburra, calxToGrind, waterForCalx, totalCalxPowder, coalFromGrinding, calxToCrush, extraCoalNeeded, calxPowderForBloodOre, bloodOre, coalForCoke, calxPowderForCoke, totalCoke, cokeForPI, pigIron, cokeForGS, calxPowderForGS, grainSteel, coalForSteel };
+        lastCalcData = { 
+            desiredSteel, crafters, defGranum, defCalx, defSaburra, defWater, defCost, 
+            reqGranum, reqCalx, reqSaburra, reqWater, saburraPowderToCraft, waterForSaburra, 
+            calxToGrind, waterForCalx, calxPowderToCraft, coalFromGrinding, calxToCrush, 
+            extraCoalNeeded, calxPowderForBloodOre, reqBloodOreToSmelt, coalForCoke, 
+            calxPowderForCoke, cokeToCraft, cokeForPI, pigIronToCraft, cokeForGS, 
+            calxPowderForGS, grainSteelToCraft, coalForSteel, saburraPowderForSteel, reqGrainSteelToBake
+        };
 
-        // Helper for UI Grid
         const makeGridCol = (matName, req, bank, def) => `
             <div class="summary-col">
                 <div class="req-val">${formatAmount(req)} <span style="font-size:0.6em;color:var(--text-dim)">${t.req}</span></div>
@@ -618,19 +685,19 @@
             </div>
         `;
 
-        // Splitter Math
         const split = (val) => Math.ceil(val / crafters).toLocaleString();
         const crftTag = crafters > 1 ? `<span style="color:var(--warning); font-size:0.9em;">${t.perCrafter}</span>` : '';
 
+        // Only show inputs if there's an actual yield output required
         document.getElementById('stepList').innerHTML = `
-            <div class="step-card"><strong>${t.step} 1 ${crftTag}:</strong> ${t.grind} <span class="highlight">${split(reqSaburra)} ${t.saburra}</span> + <span class="highlight">${split(waterForSaburra)} ${t.water}</span> &#8594; ${t.yields} ${split(saburraPowder)} ${t.sabPowder}</div>
-            <div class="step-card"><strong>${t.step} 2 ${crftTag}:</strong> ${t.grind} <span class="highlight">${split(calxToGrind)} ${t.calx}</span> + <span class="highlight">${split(waterForCalx)} ${t.water}</span> &#8594; ${t.yields} ${split(totalCalxPowder)} ${t.calxPowder} ${t.and} ${split(coalFromGrinding)} ${t.coal}</div>
+            <div class="step-card"><strong>${t.step} 1 ${crftTag}:</strong> ${t.grind} <span class="highlight">${split(reqSaburra)} ${t.saburra}</span> + <span class="highlight">${split(waterForSaburra)} ${t.water}</span> &#8594; ${t.yields} ${split(saburraPowderToCraft)} ${t.sabPowder}</div>
+            <div class="step-card"><strong>${t.step} 2 ${crftTag}:</strong> ${t.grind} <span class="highlight">${split(calxToGrind)} ${t.calx}</span> + <span class="highlight">${split(waterForCalx)} ${t.water}</span> &#8594; ${t.yields} ${split(calxPowderToCraft)} ${t.calxPowder} ${t.and} ${split(coalFromGrinding)} ${t.coal}</div>
             <div class="step-card"><strong>${t.step} 3 ${crftTag}:</strong> ${t.crush} <span class="highlight">${split(calxToCrush)} ${t.calx}</span> &#8594; ${t.yields} ${split(extraCoalNeeded)} ${t.coal}</div>
-            <div class="step-card"><strong>${t.step} 4 ${crftTag}:</strong> ${t.attractor}: <span class="highlight">${split(reqGranum)} ${t.granum}</span> + <span class="highlight">${split(calxPowderForBloodOre)} ${t.calxPowder}</span> &#8594; ${t.yields} ${split(bloodOre)} ${t.bloodOre}</div>
-            <div class="step-card"><strong>${t.step} 5 ${crftTag}:</strong> ${t.furnace}: <span class="highlight">${split(coalForCoke)} ${t.coal}</span> + <span class="highlight">${split(calxPowderForCoke)} ${t.calxPowder}</span> &#8594; ${t.yields} ${split(totalCoke)} ${t.coke}</div>
-            <div class="step-card"><strong>${t.step} 6 ${crftTag}:</strong> ${t.furnace}: <span class="highlight">${split(bloodOre)} ${t.bloodOre}</span> + <span class="highlight">${split(cokeForPI)} ${t.coke}</span> &#8594; ${t.yields} ${split(pigIron)} ${t.pigIron}</div>
-            <div class="step-card"><strong>${t.step} 7 ${crftTag}:</strong> ${t.oven}: <span class="highlight">${split(pigIron)} ${t.pigIron}</span> + <span class="highlight">${split(cokeForGS)} ${t.coke}</span> + <span class="highlight">${split(calxPowderForGS)} ${t.calxPowder}</span> &#8594; ${t.yields} ${split(grainSteel)} ${t.grainSteel}</div>
-            <div class="step-card"><strong>${t.step} 8 ${crftTag}:</strong> ${t.oven}: <span class="highlight">${split(grainSteel)} ${t.grainSteel}</span> + <span class="highlight">${split(coalForSteel)} ${t.coal}</span> + <span class="highlight">${split(saburraPowder)} ${t.sabPowder}</span> &#8594; ${t.yields} ${split(desiredSteel)} ${t.steel}</div>
+            <div class="step-card"><strong>${t.step} 4 ${crftTag}:</strong> ${t.attractor}: <span class="highlight">${split(reqGranum)} ${t.granum}</span> + <span class="highlight">${split(calxPowderForBloodOre)} ${t.calxPowder}</span> &#8594; ${t.yields} ${split(reqBloodOreToSmelt)} ${t.bloodOre}</div>
+            <div class="step-card"><strong>${t.step} 5 ${crftTag}:</strong> ${t.furnace}: <span class="highlight">${split(coalForCoke)} ${t.coal}</span> + <span class="highlight">${split(calxPowderForCoke)} ${t.calxPowder}</span> &#8594; ${t.yields} ${split(cokeToCraft)} ${t.coke}</div>
+            <div class="step-card"><strong>${t.step} 6 ${crftTag}:</strong> ${t.furnace}: <span class="highlight">${split(reqBloodOreToSmelt)} ${t.bloodOre}</span> + <span class="highlight">${split(cokeForPI)} ${t.coke}</span> &#8594; ${t.yields} ${split(pigIronToCraft)} ${t.pigIron}</div>
+            <div class="step-card"><strong>${t.step} 7 ${crftTag}:</strong> ${t.oven}: <span class="highlight">${split(pigIronToCraft)} ${t.pigIron}</span> + <span class="highlight">${split(cokeForGS)} ${t.coke}</span> + <span class="highlight">${split(calxPowderForGS)} ${t.calxPowder}</span> &#8594; ${t.yields} ${split(grainSteelToCraft)} ${t.grainSteel}</div>
+            <div class="step-card"><strong>${t.step} 8 ${crftTag}:</strong> ${t.oven}: <span class="highlight">${split(reqGrainSteelToBake)} ${t.grainSteel}</span> + <span class="highlight">${split(coalForSteel)} ${t.coal}</span> + <span class="highlight">${split(saburraPowderForSteel)} ${t.sabPowder}</span> &#8594; ${t.yields} ${split(desiredSteel)} ${t.steel}</div>
         `;
     }
 
@@ -657,9 +724,9 @@
         msg += `**3.** Crush ${s(d.calxToCrush)} Calx\n`;
         msg += `**4.** Attractor: ${s(d.reqGranum)} Granum + ${s(d.calxPowderForBloodOre)} Calx Pwdr\n`;
         msg += `**5.** Furnace: ${s(d.coalForCoke)} Coal + ${s(d.calxPowderForCoke)} Calx Pwdr\n`;
-        msg += `**6.** Furnace: ${s(d.bloodOre)} Blood Ore + ${s(d.cokeForPI)} Coke\n`;
-        msg += `**7.** Oven: ${s(d.pigIron)} Pig Iron + ${s(d.cokeForGS)} Coke + ${s(d.calxPowderForGS)} Calx Pwdr\n`;
-        msg += `**8.** Oven: ${s(d.grainSteel)} Grain Steel + ${s(d.coalForSteel)} Coal + ${s(d.saburraPowder)} Saburra Pwdr\n`;
+        msg += `**6.** Furnace: ${s(d.reqBloodOreToSmelt)} Blood Ore + ${s(d.cokeForPI)} Coke\n`;
+        msg += `**7.** Oven: ${s(d.pigIronToCraft)} Pig Iron + ${s(d.cokeForGS)} Coke + ${s(d.calxPowderForGS)} Calx Pwdr\n`;
+        msg += `**8.** Oven: ${s(d.reqGrainSteelToBake)} Grain Steel + ${s(d.coalForSteel)} Coal + ${s(d.saburraPowderForSteel)} Saburra Pwdr\n`;
 
         navigator.clipboard.writeText(msg).then(() => {
             const btn = document.getElementById('btnDiscord');
@@ -671,7 +738,7 @@
 
     function exportCSV() {
         const d = lastCalcData;
-        const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+        const dateStr = new Date().toISOString().split('T')[0];
         
         let csvContent = "data:text/csv;charset=utf-8,";
         csvContent += "Date,Target Steel,Crafters,Deficit Granum,Deficit Calx,Deficit Saburra,Deficit Water,Total Deficit Cost (g)\n";
