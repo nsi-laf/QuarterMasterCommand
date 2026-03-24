@@ -15,59 +15,59 @@ const i18n = {
     },
     fr: {
         interface: "Interface & Intégrations", themeToggle: "☀️ / 🌙 Mode Jour/Nuit", format: "Format d'affichage", optUnits: "Unités", optStacks: "Piles (10k)", webhook: "URL Webhook Discord",
-        prodCmd: "Commande de Production", target: "Acier Cible", btnMax: "⚡ Max", crafters: "Artisans", boSource: "Méthode Minerai", optAttractor: "Attracteur (Rapide)", optCrusher: "Concasseur (Gains)",
-        yieldMods: "Modificateurs", mastery: "Maîtrise (+6%)", refining: "Raffinage (+3%)", extraction: "Extraction (+3%)",
+        prodCmd: "Commande de Production", target: "Acier Cible (Target Steel)", btnMax: "⚡ Max", crafters: "Artisans (Crafters)", boSource: "Méthode Minerai (Blood Ore Method)", optAttractor: "Attracteur (Attractor)", optCrusher: "Concasseur (Crusher)",
+        yieldMods: "Modificateurs (Modifiers)", mastery: "Maîtrise (Mastery) (+6%)", refining: "Raffinage (Refining) (+3%)", extraction: "Extraction (Extraction) (+3%)",
         logStats: "Statistiques Logistiques", totalStacksLabel: "Piles à Récolter :", totalGoldLabel: "Coût Total (or) :", btnDiscord: "📋 Copier l'ordre", btnSend: "🚀 Envoyer sur Discord",
         invBank: "Banque d'Inventaire", btnReset: "🧹 Réinitialiser Tout", defGather: "Déficit à Récolter", mfgPipe: "Pipeline de Fabrication", marketCart: "Panier du Marché", btnAutoFill: "🛒 Tout Remplir",
         tblPrice: "Prix/10k", tblBuy: "Qté à Acheter", tblCost: "Coût (o)", tblStash: "Banque + Achat", cartTotal: "Total Panier :",
         noTarget: "Aucun objectif défini.", allCovered: "✅ La banque couvre tout !",
-        items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Eau", sp: "Poudre Saburra", cp: "Poudre Calx", coal: "Charbon", coke: "Coke", pi: "Fonte", gs: "Acier Grain", steel: "Acier", bo: "Minerai de Sang", amarantum: "Amarantum", flakestone: "Flakestone", granumpowder: "Poudre Granum", malachite: "Malachite", bleckblende: "Bleckblende", jadeite: "Jadeite", calspar: "Calspar" },
-        stepGrind: "Broyer", stepCrush: "Concasser", stepAttract: "Attirer", stepFurnace: "Fourneau", stepOven: "Four", stepFinal: "Four Final :", stepTo: "vers", stepYields: "produit", stepPlus: "+", perCrafter: "(Par Artisan)",
+        items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Eau (Water)", sp: "Poudre Saburra (Saburra Powder)", cp: "Poudre Calx (Calx Powder)", coal: "Charbon (Coal)", coke: "Coke", pi: "Fonte (Pig Iron)", gs: "Acier Grain (Grain Steel)", steel: "Acier (Steel)", bo: "Minerai de Sang (Blood Ore)", amarantum: "Amarantum", flakestone: "Flakestone", granumpowder: "Poudre Granum (Granum Powder)", malachite: "Malachite", bleckblende: "Bleckblende", jadeite: "Jadeite", calspar: "Calspar" },
+        stepGrind: "Broyer (Grind)", stepCrush: "Concasser (Crush)", stepAttract: "Attirer (Attract)", stepFurnace: "Fourneau (Furnace)", stepOven: "Four (Oven)", stepFinal: "Four Final (Final Oven):", stepTo: "vers", stepYields: "produit", stepPlus: "+", perCrafter: "(Par Artisan)",
         resetPrompt: "Réinitialiser toutes les valeurs à zéro ?", discHeader: "⚔️ ORDRE LOGISTIQUE : ACIER ⚔️", discLoad: "Piles :", discReq: "RÉCOLTE MANUELLE REQUISE :", discStock: "Toute la récolte est couverte.", discCopied: "Copié dans le presse-papiers !",
         discMarket: "ACHATS AU MARCHÉ :", errWebhook: "URL Webhook invalide.", errSend: "Échec de l'envoi. Vérifiez l'URL.", sucSend: "Ordre envoyé sur Discord !",
-        qAdd: "+10k", qAddStk: "+1 Pile", byproductsTitle: "SOUS-PRODUITS RÉCUPÉRÉS"
+        qAdd: "+10k", qAddStk: "+1 Pile", byproductsTitle: "SOUS-PRODUITS RÉCUPÉRÉS (BYPRODUCTS)"
     },
     es: {
         interface: "Interfaz e Integraciones", themeToggle: "☀️ / 🌙 Modo Día/Noche", format: "Formato de visualización", optUnits: "Unidades", optStacks: "Pilas (10k)", webhook: "URL Webhook Discord",
-        prodCmd: "Comando de Producción", target: "Acero Objetivo", btnMax: "⚡ Max", crafters: "Artesanos", boSource: "Método Mineral", optAttractor: "Atractor (Rápido)", optCrusher: "Trituradora (Ganancias)",
-        yieldMods: "Modificadores", mastery: "Maestría (+6%)", refining: "Refinación (+3%)", extraction: "Extracción (+3%)",
+        prodCmd: "Comando de Producción", target: "Acero Objetivo (Target Steel)", btnMax: "⚡ Max", crafters: "Artesanos (Crafters)", boSource: "Método Mineral (Blood Ore Method)", optAttractor: "Atractor (Attractor)", optCrusher: "Trituradora (Crusher)",
+        yieldMods: "Modificadores (Modifiers)", mastery: "Maestría (Mastery) (+6%)", refining: "Refinación (Refining) (+3%)", extraction: "Extracción (Extraction) (+3%)",
         logStats: "Estadísticas Logísticas", totalStacksLabel: "Pilas a Recolectar:", totalGoldLabel: "Costo Total (oro):", btnDiscord: "📋 Copiar al portapapeles", btnSend: "🚀 Enviar a Discord",
         invBank: "Banco de Inventario", btnReset: "🧹 Restablecer Todo", defGather: "Déficit a Recolectar", mfgPipe: "Tubería de Fabricación", marketCart: "Carrito del Mercado", btnAutoFill: "🛒 Llenar Todo",
         tblPrice: "Precio/10k", tblBuy: "Cant a Comprar", tblCost: "Costo (o)", tblStash: "Banco + Compra", cartTotal: "Total Carrito:",
         noTarget: "Ningún objetivo definido.", allCovered: "✅ ¡El banco cubre todo!",
-        items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Agua", sp: "Polvo Saburra", cp: "Polvo Calx", coal: "Carbón", coke: "Coque", pi: "Arrabio", gs: "Acero de Grano", steel: "Acero", bo: "Mineral de Sangre", amarantum: "Amarantum", flakestone: "Flakestone", granumpowder: "Polvo Granum", malachite: "Malachite", bleckblende: "Bleckblende", jadeite: "Jadeite", calspar: "Calspar" },
-        stepGrind: "Moler", stepCrush: "Triturar", stepAttract: "Atraer", stepFurnace: "Horno", stepOven: "Horno", stepFinal: "Horno Final:", stepTo: "a", stepYields: "produce", stepPlus: "+", perCrafter: "(Por Artesano)",
+        items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Agua (Water)", sp: "Polvo Saburra (Saburra Powder)", cp: "Polvo Calx (Calx Powder)", coal: "Carbón (Coal)", coke: "Coque (Coke)", pi: "Arrabio (Pig Iron)", gs: "Acero de Grano (Grain Steel)", steel: "Acero (Steel)", bo: "Mineral de Sangre (Blood Ore)", amarantum: "Amarantum", flakestone: "Flakestone", granumpowder: "Polvo Granum (Granum Powder)", malachite: "Malachite", bleckblende: "Bleckblende", jadeite: "Jadeite", calspar: "Calspar" },
+        stepGrind: "Moler (Grind)", stepCrush: "Triturar (Crush)", stepAttract: "Atraer (Attract)", stepFurnace: "Horno (Furnace)", stepOven: "Horno (Oven)", stepFinal: "Horno Final (Final Oven):", stepTo: "a", stepYields: "produce", stepPlus: "+", perCrafter: "(Por Artesano)",
         resetPrompt: "¿Restablecer todos los valores a cero?", discHeader: "⚔️ ORDEN LOGÍSTICA: ACERO ⚔️", discLoad: "Pilas:", discReq: "RECOLECCIÓN MANUAL REQUERIDA:", discStock: "Toda la recolección está cubierta.", discCopied: "¡Copiado al portapapeles!",
         discMarket: "COMPRAS EN EL MERCADO:", errWebhook: "URL Webhook inválida.", errSend: "Error al enviar. Verifique la URL.", sucSend: "¡Orden enviada a Discord!",
-        qAdd: "+10k", qAddStk: "+1 Pila", byproductsTitle: "SUBPRODUCTOS RECUPERADOS"
+        qAdd: "+10k", qAddStk: "+1 Pila", byproductsTitle: "SUBPRODUCTOS RECUPERADOS (BYPRODUCTS)"
     },
     pt: {
         interface: "Interface e Integrações", themeToggle: "☀️ / 🌙 Modo Dia/Noite", format: "Formato", optUnits: "Unidades", optStacks: "Pilhas (10k)", webhook: "URL Webhook Discord",
-        prodCmd: "Comando de Produção", target: "Aço Alvo", btnMax: "⚡ Max", crafters: "Artesãos", boSource: "Método Minério", optAttractor: "Atrator (Rápido)", optCrusher: "Triturador (Lucros)",
-        yieldMods: "Modificadores", mastery: "Maestria (+6%)", refining: "Refinamento (+3%)", extraction: "Extração (+3%)",
+        prodCmd: "Comando de Produção", target: "Aço Alvo (Target Steel)", btnMax: "⚡ Max", crafters: "Artesãos (Crafters)", boSource: "Método Minério (Blood Ore Method)", optAttractor: "Atrator (Attractor)", optCrusher: "Triturador (Crusher)",
+        yieldMods: "Modificadores (Modifiers)", mastery: "Maestria (Mastery) (+6%)", refining: "Refinamento (Refining) (+3%)", extraction: "Extração (Extraction) (+3%)",
         logStats: "Estatísticas Logísticas", totalStacksLabel: "Pilhas a Coletar:", totalGoldLabel: "Custo Total (ouro):", btnDiscord: "📋 Copiar ordem", btnSend: "🚀 Enviar para Discord",
         invBank: "Banco de Inventário", btnReset: "🧹 Redefinir Tudo", defGather: "Déficit a Coletar", mfgPipe: "Pipeline de Fabricação", marketCart: "Carrinho do Mercado", btnAutoFill: "🛒 Preencher Tudo",
         tblPrice: "Preço/10k", tblBuy: "Qtd a Comprar", tblCost: "Custo (o)", tblStash: "Banco + Compra", cartTotal: "Total Carrinho:",
         noTarget: "Nenhum alvo definido.", allCovered: "✅ O banco cobre tudo!",
-        items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Água", sp: "Pó Saburra", cp: "Pó Calx", coal: "Carvão", coke: "Coque", pi: "Ferro-gusa", gs: "Aço de Grão", steel: "Aço", bo: "Minério de Sangue", amarantum: "Amarantum", flakestone: "Flakestone", granumpowder: "Pó Granum", malachite: "Malachite", bleckblende: "Bleckblende", jadeite: "Jadeite", calspar: "Calspar" },
-        stepGrind: "Moer", stepCrush: "Triturar", stepAttract: "Atrair", stepFurnace: "Fornalha", stepOven: "Forno", stepFinal: "Forno Final:", stepTo: "para", stepYields: "produz", stepPlus: "+", perCrafter: "(Por Artesão)",
+        items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Água (Water)", sp: "Pó Saburra (Saburra Powder)", cp: "Pó Calx (Calx Powder)", coal: "Carvão (Coal)", coke: "Coque (Coke)", pi: "Ferro-gusa (Pig Iron)", gs: "Aço de Grão (Grain Steel)", steel: "Aço (Steel)", bo: "Minério de Sangue (Blood Ore)", amarantum: "Amarantum", flakestone: "Flakestone", granumpowder: "Pó Granum (Granum Powder)", malachite: "Malachite", bleckblende: "Bleckblende", jadeite: "Jadeite", calspar: "Calspar" },
+        stepGrind: "Moer (Grind)", stepCrush: "Triturar (Crush)", stepAttract: "Atrair (Attract)", stepFurnace: "Fornalha (Furnace)", stepOven: "Forno (Oven)", stepFinal: "Forno Final (Final Oven):", stepTo: "para", stepYields: "produz", stepPlus: "+", perCrafter: "(Por Artesão)",
         resetPrompt: "Redefinir todos os valores para zero?", discHeader: "⚔️ ORDEM LOGÍSTICA: AÇO ⚔️", discLoad: "Pilhas:", discReq: "COLETA MANUAL NECESSÁRIA:", discStock: "Toda a coleta está coberta.", discCopied: "Copiado para a área de transferência!",
         discMarket: "COMPRAS NO MERCADO:", errWebhook: "URL Webhook inválida.", errSend: "Falha ao enviar. Verifique o URL.", sucSend: "Ordem enviada ao Discord!",
-        qAdd: "+10k", qAddStk: "+1 Pilha", byproductsTitle: "SUBPRODUTOS RECUPERADOS"
+        qAdd: "+10k", qAddStk: "+1 Pilha", byproductsTitle: "SUBPRODUTOS RECUPERADOS (BYPRODUCTS)"
     },
     de: {
         interface: "Schnittstelle & Integrationen", themeToggle: "☀️ / 🌙 Tag/Nacht-Modus", format: "Anzeigeformat", optUnits: "Einheiten", optStacks: "Stapel (10k)", webhook: "Discord Webhook URL",
-        prodCmd: "Produktionsbefehl", target: "Ziel Stahl", btnMax: "⚡ Max", crafters: "Handwerker", boSource: "Bluterz Methode", optAttractor: "Attraktor (Schnell)", optCrusher: "Brecher (Nebenprodukte)",
-        yieldMods: "Ertragsmodifikatoren", mastery: "Meisterschaft (+6%)", refining: "Raffinieren (+3%)", extraction: "Extraktion (+3%)",
+        prodCmd: "Produktionsbefehl", target: "Ziel Stahl (Target Steel)", btnMax: "⚡ Max", crafters: "Handwerker (Crafters)", boSource: "Bluterz Methode (Blood Ore Method)", optAttractor: "Attraktor (Attractor)", optCrusher: "Brecher (Crusher)",
+        yieldMods: "Ertragsmodifikatoren (Modifiers)", mastery: "Meisterschaft (Mastery) (+6%)", refining: "Raffinieren (Refining) (+3%)", extraction: "Extraktion (Extraction) (+3%)",
         logStats: "Logistik-Statistiken", totalStacksLabel: "Zu sammelnde Stapel:", totalGoldLabel: "Gesamtkosten (Gold):", btnDiscord: "📋 In die Zwischenablage kopieren", btnSend: "🚀 An Discord senden",
         invBank: "Inventarbank", btnReset: "🧹 Alles zurücksetzen", defGather: "Zu sammelndes Defizit", mfgPipe: "Fertigungspipeline", marketCart: "Marktwagen", btnAutoFill: "🛒 Alles füllen",
         tblPrice: "Preis/10k", tblBuy: "Kaufmenge", tblCost: "Kosten (g)", tblStash: "Bank + Kauf", cartTotal: "Gesamtwagen:",
         noTarget: "Kein Ziel festgelegt.", allCovered: "✅ Bank deckt alles ab!",
-        items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Wasser", sp: "Saburrapulver", cp: "Calxpulver", coal: "Kohle", coke: "Koks", pi: "Roheisen", gs: "Kornstahl", steel: "Stahl", bo: "Bluterz", amarantum: "Amarantum", flakestone: "Flakestone", granumpowder: "Granumpulver", malachite: "Malachite", bleckblende: "Bleckblende", jadeite: "Jadeite", calspar: "Calspar" },
-        stepGrind: "Mahlen", stepCrush: "Brechen", stepAttract: "Anziehen", stepFurnace: "Schmelzofen", stepOven: "Ofen", stepFinal: "Finaler Ofen:", stepTo: "zu", stepYields: "ergibt", stepPlus: "+", perCrafter: "(Pro Handwerker)",
+        items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Wasser (Water)", sp: "Saburrapulver (Saburra Powder)", cp: "Calxpulver (Calx Powder)", coal: "Kohle (Coal)", coke: "Koks (Coke)", pi: "Roheisen (Pig Iron)", gs: "Kornstahl (Grain Steel)", steel: "Stahl (Steel)", bo: "Bluterz (Blood Ore)", amarantum: "Amarantum", flakestone: "Flakestone", granumpowder: "Granumpulver (Granum Powder)", malachite: "Malachite", bleckblende: "Bleckblende", jadeite: "Jadeite", calspar: "Calspar" },
+        stepGrind: "Mahlen (Grind)", stepCrush: "Brechen (Crush)", stepAttract: "Anziehen (Attract)", stepFurnace: "Schmelzofen (Furnace)", stepOven: "Ofen (Oven)", stepFinal: "Finaler Ofen (Final Oven):", stepTo: "zu", stepYields: "ergibt", stepPlus: "+", perCrafter: "(Pro Handwerker)",
         resetPrompt: "Alle Werte auf null zurücksetzen?", discHeader: "⚔️ LOGISTIKAUFTRAG: STAHL ⚔️", discLoad: "Stapel:", discReq: "MANUELLES SAMMELN ERFORDERLICH:", discStock: "Alles Sammeln abgedeckt.", discCopied: "In die Zwischenablage kopiert!",
         discMarket: "MARKTKÄUFE:", errWebhook: "Ungültige Webhook URL.", errSend: "Senden fehlgeschlagen. URL prüfen.", sucSend: "Auftrag an Discord gesendet!",
-        qAdd: "+10k", qAddStk: "+1 Stapel", byproductsTitle: "ZURÜCKGEWONNENE NEBENPRODUKTE"
+        qAdd: "+10k", qAddStk: "+1 Stapel", byproductsTitle: "ZURÜCKGEWONNENE NEBENPRODUKTE (BYPRODUCTS)"
     }
 };
 
@@ -295,7 +295,6 @@ function runEngine(targetRaw, bankData, mode) {
     let rGranum = 0;
     let cpForBlood = 0;
     
-    // Dynamic Granum Logic Based on User Selection
     if (boSource === 'crusher') {
         rGranum = Math.ceil(rBlood / (0.0770 * mE * mM));
         bp.amarantum += Math.ceil(rGranum * 0.0882 * mE);
@@ -313,20 +312,17 @@ function runEngine(targetRaw, bankData, mode) {
     const spForSteel = Math.ceil(rGS * 0.5);
     const diffSP = Math.max(0, spForSteel - bankData.sp);
 
-    // Saburra Grinder
     const rSaburra = Math.ceil(diffSP / (0.4275 * mE));
     bp.bleckblende += Math.ceil(rSaburra * 0.1901 * mE);
     bp.jadeite += Math.ceil(rSaburra * 0.0016 * mE);
     bp.malachite += Math.ceil(rSaburra * 0.0950 * mE);
 
-    // Calx Grinder
     const calxToGrind = Math.ceil(diffCP / (0.2058 * mE));
     const coalFromGrind = Math.ceil(calxToGrind * 0.1140 * mE);
     bp.coal += coalFromGrind;
     bp.flakestone += Math.ceil(calxToGrind * 0.0036 * mE);
     bp.malachite += Math.ceil(calxToGrind * 0.0528 * mE);
 
-    // Calx Crusher
     const calxToCrush = Math.ceil(Math.max(0, diffCoal - coalFromGrind) / (0.2160 * mE));
     bp.coal += Math.ceil(calxToCrush * 0.2160 * mE);
     bp.calspar += Math.ceil(calxToCrush * 0.0360 * mE);
@@ -448,7 +444,6 @@ function calculate() {
     if (res.calxToGrind > 0) steps.push(`${t.stepGrind} <span class="highlight">${s(res.calxToGrind)} ${t.items.calx}</span> ${t.stepPlus} <span class="highlight">${s(res.waterForCalx)} ${t.items.water}</span> ${t.stepYields} <span class="highlight">${s(res.diffCP)} ${t.items.cp}</span> ${t.stepPlus} <span class="highlight">${s(res.coalFromGrind)} ${t.items.coal}</span>`);
     if (res.calxToCrush > 0) steps.push(`${t.stepCrush} <span class="highlight">${s(res.calxToCrush)} ${t.items.calx}</span> ${t.stepYields} <span class="highlight">${s(res.extraCoal)} ${t.items.coal}</span>`);
     
-    // Dynamic Granum Step based on selected method
     if (res.rGranum > 0) {
         if (res.boSource === 'crusher') {
             steps.push(`${t.stepCrush}: <span class="highlight">${s(res.rGranum)} ${t.items.granum}</span> ${t.stepYields} <span class="highlight">${s(res.rBlood)} ${t.items.bo}</span>`);
@@ -466,7 +461,6 @@ function calculate() {
 
     let outputHTML = steps.map(text => `<div class="step-card">${text}${perCr}</div>`).join('');
     
-    // Byproducts Display
     let byproductsString = "";
     Object.keys(res.byproducts).forEach(k => {
         if (res.byproducts[k] > 0) {
