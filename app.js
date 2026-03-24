@@ -7,16 +7,17 @@ const i18n = {
         invBank: "Inventory Bank", btnReset: "🧹 Reset All Bank & Cart", defGather: "Deficit to Gather Manually", mfgPipe: "Manufacturing Pipeline", marketCart: "Market Cart", btnAutoFill: "🛒 Auto-Fill All",
         tblPrice: "Price/10k", tblBuy: "Amount to Buy", tblCost: "Cost (g)", tblStash: "Bank + Buy", cartTotal: "Cart Total:",
         noTarget: "No target set.", allCovered: "✅ Bank & Cart cover all raw materials!",
-        items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Water", sp: "Saburra Pwdr", cp: "Calx Pwdr", coal: "Coal", coke: "Coke", pi: "Pig Iron", gs: "Grain Steel", steel: "Steel", bo: "Blood Ore" },
+        items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Water", sp: "Saburra Powder", cp: "Calx Powder", coal: "Coal", coke: "Coke", pi: "Pig Iron", gs: "Grain Steel", steel: "Steel", bo: "Blood Ore" },
         stepGrind: "Grind", stepCrush: "Crush", stepAttract: "Attract", stepFurnace: "Furnace", stepOven: "Oven", stepFinal: "Final Oven:",
         stepTo: "to", stepYields: "yields", stepPlus: "+", perCrafter: "(Per Crafter)",
         resetPrompt: "Reset all bank values and shopping cart to zero?", discHeader: "⚔️ LOGISTICS ORDER: STEEL ⚔️", discLoad: "Gather Stacks:", discReq: "MANUAL GATHER REQUIRED:", discStock: "All gathering covered.", discCopied: "Copied to clipboard!",
         discMarket: "MARKET PURCHASES:", errWebhook: "Please enter a valid Discord Webhook URL in the Interface settings.", errSend: "Failed to send to Discord. Check URL.", sucSend: "Order dispatched to Discord!",
-        qAdd: "+10k", qAddStk: "+1 Stk"
+        qAdd: "+10k", qAddStk: "+1 Stk",
+        byproductCoal: "Total Byproduct Coal Recovered:"
     }
 };
 
-// Fallback to English for languages not fully defined yet
+// Fallback to English
 ['fr', 'es', 'pt', 'de'].forEach(l => i18n[l] = i18n.en);
 
 let timer = null;
@@ -28,6 +29,15 @@ const rawKeys = ['granum', 'calx', 'saburra', 'water'];
 const defaultPrices = { granum: 15, calx: 35, saburra: 15, water: 1 };
 
 let pureDeficits = { granum: 0, calx: 0, saburra: 0, water: 0 }; 
+let pipelineStepsRaw = []; // Store raw steps for Discord
+
+// Modal Logic
+function openSettings() { document.getElementById('settingsModal').style.display = 'block'; }
+function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
+window.onclick = function(event) {
+    let modal = document.getElementById('settingsModal');
+    if (event.target == modal) { modal.style.display = "none"; }
+}
 
 function changeLang() {
     currentLang = document.getElementById('lang').value;
@@ -102,7 +112,7 @@ function renderMarketTable() {
                 <span class="mobile-label">${t.tblBuy}</span>
                 <div class="buy-group">
                     <input type="number" id="buy_${k}" value="${currentVals['buy_'+k]}" oninput="run()">
-                    <button class="btn-stack" onclick="autoFillRow('${k}')" title="Fill Missing">🛒</button>
+                    <button class="btn-cart" onclick="autoFillRow('${k}')" title="Fill Missing">🛒</button>
                 </div>
             </div>
             <div style="text-align:right">
@@ -282,6 +292,7 @@ function calculate() {
         document.getElementById('stepsOutput').innerHTML = "";
         document.getElementById('statStacks').innerText = "0.00";
         document.getElementById('statGold').innerText = "0.00 g";
+        pipelineStepsRaw = [];
         if(document.getElementById('cartTotalGold')) document.getElementById('cartTotalGold').innerText = "0.00 g";
         rawKeys.forEach(k => {
             if(document.getElementById('cost_' + k)) document.getElementById('cost_' + k).innerText = "0.00";
@@ -297,10 +308,8 @@ function calculate() {
     let purchased = {};
     
     rawKeys.forEach(k => {
-        // Cache the elements so you aren't searching the document repeatedly
         const costEl = document.getElementById('cost_' + k);
         const stashEl = document.getElementById('stash_' + k);
-        
         const price = Number(document.getElementById('p_' + k).value) || 0;
         const buyQtyRaw = Number(document.getElementById('buy_' + k).value) || 0;
         const bankQtyRaw = Number(document.getElementById('b_' + k).value) || 0;
@@ -311,7 +320,6 @@ function calculate() {
         const cost = (buyQtyUnits / 10000) * price;
         totalGold += cost;
         
-        // Only update the DOM if the element actually exists to prevent errors
         if (costEl) costEl.innerText = cost > 0 ? cost.toFixed(2) : "0.00";
         if (stashEl) {
             const totalStashRaw = bankQtyRaw + buyQtyRaw;
@@ -360,7 +368,20 @@ function calculate() {
     if (res.diffGS > 0) steps.push(`${t.stepOven}: <span class="highlight">${s(res.diffPI)} ${t.items.pi}</span> ${t.stepPlus} <span class="highlight">${s(res.cokeForGS)} ${t.items.coke}</span> ${t.stepPlus} <span class="highlight">${s(res.cpForGS)} ${t.items.cp}</span> ${t.stepYields} <span class="highlight">${s(res.diffGS)} ${t.items.gs}</span>`);
     steps.push(`${t.stepFinal} <span class="highlight">${s(res.reqGS)} ${t.items.gs}</span> ${t.stepPlus} <span class="highlight">${s(res.coalForSteel)} ${t.items.coal}</span> ${t.stepPlus} <span class="highlight">${s(res.spForSteel)} ${t.items.sp}</span> ${t.stepYields} <span class="highlight">${(targetRaw * mult).toLocaleString()} ${t.items.steel}</span>`);
     
-    document.getElementById('stepsOutput').innerHTML = steps.map(text => `<div class="step-card">${text}${perCr}</div>`).join('');
+    // Save raw steps for Discord formatting later
+    pipelineStepsRaw = steps.slice();
+
+    let outputHTML = steps.map(text => `<div class="step-card">${text}${perCr}</div>`).join('');
+    
+    // Add Byproducts Information
+    const totalByproductCoal = res.coalFromGrind + res.extraCoal;
+    if (totalByproductCoal > 0) {
+        outputHTML += `<div style="margin-top: 15px; padding: 10px; border-top: 1px dashed var(--border); color: var(--text-dim); text-align: right; font-size: 12px;">
+            ${t.byproductCoal} <span style="color: var(--accent); font-weight: bold;">${totalByproductCoal.toLocaleString()}</span>
+        </div>`;
+    }
+
+    document.getElementById('stepsOutput').innerHTML = outputHTML;
     save();
 }
 
@@ -394,14 +415,29 @@ function load() {
 function buildDiscordMessage() {
     const t = i18n[currentLang];
     const mode = document.getElementById('mode').value;
-    let msg = `**${t.discHeader}**\n\n`;
+    const targetVal = document.getElementById('targetSteel').value;
+    let msg = `**${t.discHeader}**\n*Targeting ${targetVal} ${mode === 'stacks' ? 'Stacks' : 'Units'} of ${t.items.steel}*\n\n`;
     
+    // 1. Bank Stock
+    let bankString = "";
+    itemKeys.forEach(k => {
+        let bankRaw = Number(document.getElementById('b_'+k).value) || 0;
+        if (bankRaw > 0) {
+            let fmtAmt = mode === 'stacks' ? bankRaw.toFixed(2) + " Stacks" : bankRaw.toLocaleString();
+            bankString += `- ${t.items[k]}: ${fmtAmt}\n`;
+        }
+    });
+    if (bankString !== "") {
+        msg += `**CURRENT BANK STOCK:**\n\`\`\`\n${bankString}\`\`\`\n`;
+    }
+
+    // 2. Market Purchases
     let marketString = "";
     let hasMarket = false;
     rawKeys.forEach(k => {
         let buyRaw = Number(document.getElementById('buy_'+k).value) || 0;
         if (buyRaw > 0) {
-            let fmtAmt = mode === 'stacks' ? buyRaw.toFixed(2) + " Stacks" : (buyRaw).toLocaleString();
+            let fmtAmt = mode === 'stacks' ? buyRaw.toFixed(2) + " Stacks" : buyRaw.toLocaleString();
             marketString += `- ${t.items[k]}: ${fmtAmt}\n`;
             hasMarket = true;
         }
@@ -411,12 +447,25 @@ function buildDiscordMessage() {
         msg += `**${t.discMarket}**\n\`\`\`\n${marketString}\nTotal Budget: ${document.getElementById('statGold').innerText}\n\`\`\`\n`;
     }
 
+    // 3. Manual Gather
     const stacks = document.getElementById('statStacks').innerText;
     msg += `**${t.discReq}**\n\`\`\`\n`;
     const items = document.querySelectorAll('.logistics-item');
     if (items.length === 0) msg += `${t.discStock}\n`;
     items.forEach(el => msg += `- ${el.innerText.replace('\n', ': ')}\n`);
-    msg += `\nTotal: ${stacks} Stacks to Gather\`\`\``;
+    msg += `\nTotal: ${stacks} Stacks to Gather\`\`\`\n`;
+
+    // 4. Manufacturing Pipeline
+    if (pipelineStepsRaw.length > 0) {
+        msg += `**MANUFACTURING PIPELINE:**\n\`\`\`\n`;
+        pipelineStepsRaw.forEach(step => {
+            // Strip out HTML tags for clean Discord text
+            let cleanText = step.replace(/<[^>]*>?/gm, '');
+            msg += `- ${cleanText}\n`;
+        });
+        msg += `\`\`\``;
+    }
+
     return msg;
 }
 
@@ -432,6 +481,7 @@ async function sendToDiscord() {
     
     if (!webhookUrl || !webhookUrl.startsWith('https://discord.com/api/webhooks/')) {
         alert(t.errWebhook);
+        openSettings(); // Open the modal automatically if it fails so they can see the input
         return;
     }
 
@@ -458,7 +508,6 @@ async function sendToDiscord() {
     }
 }
 
-// Window init and Service Worker registration
 window.onload = () => {
     init();
     if ('serviceWorker' in navigator) {
