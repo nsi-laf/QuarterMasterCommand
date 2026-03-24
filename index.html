@@ -13,36 +13,42 @@
 <body>
 
 <div class="app-header">
+    <button onclick="openSettings()" class="btn-settings">⚙️ Settings</button>
     <h1 class="app-title">Quartermaster Command</h1>
     <div class="app-subtitle">STEEL LOGISTICS v4.5 • MADE BY JAEGH</div>
 </div>
 
+<div id="settingsModal" class="modal">
+    <div class="modal-content module">
+        <div class="module-header">
+            <span id="ui_interface">Interface & Integrations</span>
+            <span class="close" onclick="closeSettings()">&times;</span>
+        </div>
+        <div class="input-row">
+            <select id="lang" onchange="changeLang()" style="width: 100%; margin-bottom: 10px;">
+                <option value="en">🇬🇧 English</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="es">🇪🇸 Español</option>
+                <option value="pt">🇵🇹 Português</option>
+                <option value="de">🇩🇪 Deutsch</option>
+            </select>
+        </div>
+        <button class="btn-theme" id="ui_themeToggle" onclick="toggleTheme()">☀️ / 🌙 Day/Night Mode</button>
+        <div class="input-row"><label id="ui_format">Display Format</label>
+            <select id="mode" onchange="handleModeChange()">
+                <option value="units" id="ui_optUnits">Units</option>
+                <option value="stacks" id="ui_optStacks">Stacks (10k)</option>
+            </select>
+        </div>
+        <div style="margin-top: 15px;">
+            <label id="ui_webhook" style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; display: block;">Discord Webhook URL</label>
+            <input type="password" id="webhookUrl" class="webhook-input" placeholder="https://discord.com/api/webhooks/..." onchange="save()">
+        </div>
+    </div>
+</div>
+
 <div class="dashboard">
     <div class="sidebar">
-        <div class="module">
-            <div class="module-header" id="ui_interface">Interface & Integrations</div>
-            <div class="input-row">
-                <select id="lang" onchange="changeLang()" style="width: 100%; margin-bottom: 10px;">
-                    <option value="en">🇬🇧 English</option>
-                    <option value="fr">🇫🇷 Français</option>
-                    <option value="es">🇪🇸 Español</option>
-                    <option value="pt">🇵🇹 Português</option>
-                    <option value="de">🇩🇪 Deutsch</option>
-                </select>
-            </div>
-            <button class="btn-theme" id="ui_themeToggle" onclick="toggleTheme()">☀️ / 🌙 Day/Night Mode</button>
-            <div class="input-row"><label id="ui_format">Display Format</label>
-                <select id="mode" onchange="handleModeChange()">
-                    <option value="units" id="ui_optUnits">Units</option>
-                    <option value="stacks" id="ui_optStacks">Stacks (10k)</option>
-                </select>
-            </div>
-            <div style="margin-top: 15px;">
-                <label id="ui_webhook" style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; display: block;">Discord Webhook URL</label>
-                <input type="password" id="webhookUrl" class="webhook-input" placeholder="https://discord.com/api/webhooks/..." onchange="save()">
-            </div>
-        </div>
-
         <div class="module">
             <div class="module-header" id="ui_prodCmd">Production Command</div>
             <div class="input-row">
@@ -81,7 +87,7 @@
         </div>
 
         <div class="module">
-            <div class="module-header"><span id="ui_marketCart">Market Cart (Raw Materials)</span> <button class="btn-stack" id="ui_btnAutoFill" onclick="autoFillCart()">🛒 Auto-Fill All</button></div>
+            <div class="module-header"><span id="ui_marketCart">Market Cart (Raw Materials)</span> <button class="btn-cart" id="ui_btnAutoFill" onclick="autoFillCart()">🛒 Auto-Fill All</button></div>
             <div id="marketContainer"></div>
         </div>
 
