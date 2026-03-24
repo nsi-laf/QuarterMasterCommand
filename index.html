@@ -3,470 +3,498 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quartermaster Steel Logistics Suite</title>
+    <title>Quartermaster Command: Steel Logistics v4.1</title>
     <style>
         :root {
-            /* Dark Theme (Default) */
-            --bg-main: #1e1e24;
-            --bg-container: #2b2b36;
-            --text-main: #f5f5f5;
-            --accent: #d4af37;
-            --accent-hover: #b5952f;
-            --border-color: #3a3a48;
-            --bg-input: #1e1e24;
-            --bg-box: #3a3a48;
-            --bg-step: #23232c;
-            --bg-cost: #2a2a1e;
-            --text-dim: #a9a9b3;
-            --text-value: #e0e0e0;
-            --success: #4CAF50;
-            --warning: #ff9800;
-            /* Heat Map Colors */
-            --hm-none: #666666;
-            --hm-low: #ffcc00;
-            --hm-high: #ff4400;
+            --bg-main: #0f0f12; --bg-card: #1c1c21; --bg-input: #0a0a0c;
+            --accent: #d4af37; --text: #e0e0e0; --text-dim: #888888;
+            --border: #2d2d35; --success: #4caf50; --warning: #ff9800; --danger: #f44336;
+            --hm-none: #444; --hm-low: #ffd700; --hm-high: #ff4500;
         }
 
         .light-theme {
-            --bg-main: #f0f2f5;
-            --bg-container: #ffffff;
-            --text-main: #333333;
-            --accent: #b5952f;
-            --accent-hover: #8f7524;
-            --border-color: #cccccc;
-            --bg-input: #f9f9f9;
-            --bg-box: #e9ecef;
-            --bg-step: #f8f9fa;
-            --bg-cost: #fff8e1;
-            --text-dim: #666666;
-            --text-value: #111111;
-            --success: #2e7d32;
-            --warning: #e65100;
+            --bg-main: #f0f2f5; --bg-card: #ffffff; --bg-input: #f9f9f9;
+            --accent: #b5952f; --text: #1a1a1a; --text-dim: #666666;
+            --border: #cccccc; --hm-none: #bbbbbb;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .container {
-            max-width: 900px;
-            width: 100%;
-            background-color: var(--bg-container);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
-            position: relative;
-        }
-        h1, h2, h3 { color: var(--accent); }
-        h1 { text-align: center; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-top: 30px;}
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-main); color: var(--text); margin: 0; padding: 20px; font-size: 14px; transition: background 0.3s, color 0.3s; }
+        .dashboard { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
+        .module { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .module-header { color: var(--accent); font-weight: bold; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        input, select { background: var(--bg-input); border: 1px solid var(--border); color: var(--accent); padding: 5px; border-radius: 2px; text-align: center; width: 95px; }
+        input[type="checkbox"] { width: 20px; cursor: pointer; }
         
-        .header-controls {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            display: flex;
-            gap: 10px;
-        }
-        .header-btn, .header-select {
-            background-color: var(--accent);
-            color: #1e1e24;
-            border: none;
-            padding: 8px 12px;
-            font-size: 1em;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
+        .btn-stack { background: var(--accent); color: #000; border: none; padding: 4px 8px; font-size: 11px; border-radius: 2px; cursor: pointer; font-weight: bold; margin-left: 4px; transition: 0.2s; min-width: 60px; }
+        .btn-stack:hover { filter: brightness(1.2); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-theme { background: var(--border); color: var(--text); width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--accent); cursor: pointer; font-weight: bold; }
 
-        .controls { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 20px 0; }
-        .input-group { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
-        .input-group label { font-size: 1.1em; margin-bottom: 8px; font-weight: bold; }
+        .bank-table { width: 100%; border-collapse: collapse; }
+        .bank-table td { padding: 6px 0; border-bottom: 1px solid var(--border); }
         
-        .input-wrapper {
-            display: flex;
-            align-items: center;
-            background-color: var(--bg-input);
-            border: 2px solid var(--accent);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        .input-wrapper input[type="number"] {
-            font-size: 1.5em;
-            padding: 8px;
-            width: 100%;
-            text-align: center;
-            background-color: transparent;
-            color: var(--text-main);
-            border: none;
-            outline: none;
-        }
-
-        .bonus-toggles {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            background-color: var(--bg-cost);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border-left: 4px solid var(--accent);
-        }
-
-        .inventory-grid, .intermediate-grid {
-            display: grid;
-            gap: 10px;
-            background-color: var(--bg-step);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-            align-items: center;
-        }
-        .inventory-grid { grid-template-columns: 1fr 1fr 1fr; }
-        .intermediate-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
-
-        .inv-header {
-            font-weight: bold;
-            color: var(--text-dim);
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 5px;
-        }
-
-        .inv-cell input {
-            width: 90px;
-            font-size: 1.1em;
-            padding: 6px;
-            text-align: center;
-            background-color: var(--bg-input);
-            color: var(--text-main);
-            border: 1px solid var(--accent);
-            border-radius: 5px;
-        }
-
-        .summary-box {
-            background-color: var(--bg-box);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            display: grid;
-            gap: 10px;
-        }
-        .summary-col { text-align: center; display: flex; flex-direction: column; gap: 5px; }
-        .req-val { font-size: 1.1em; color: var(--text-main); opacity: 0.8; }
-        .bank-val { font-size: 0.9em; color: var(--text-dim); }
-        .def-val { font-size: 1.4em; font-weight: bold; transition: color 0.3s; }
+        .logistics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .logistics-item { padding: 10px; background: var(--bg-input); border-radius: 4px; border-left: 4px solid var(--hm-none); display: flex; justify-content: space-between; align-items: center; }
+        .hm-low { border-left-color: var(--hm-low); color: var(--hm-low); }
+        .hm-high { border-left-color: var(--hm-high); color: var(--hm-high); font-weight: bold; }
         
-        /* Heat-map utility classes */
-        .hm-gray { color: var(--hm-none); opacity: 0.5; }
-        .hm-yellow { color: var(--hm-low); text-shadow: 0 0 5px rgba(255, 204, 0, 0.2); }
-        .hm-red { color: var(--hm-high); text-shadow: 0 0 8px rgba(255, 68, 0, 0.3); }
-
-        .cost-box {
-            background-color: var(--bg-cost);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-around;
-            border-left: 4px solid var(--accent);
-        }
-
-        .step-card {
-            background-color: var(--bg-step);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--accent);
-            border-radius: 4px;
-        }
+        .step-card { background: var(--bg-input); padding: 10px; margin-bottom: 8px; border-left: 3px solid var(--accent); font-size: 13px; line-height: 1.5; }
         .highlight { color: var(--accent); font-weight: bold; }
+        .stat-val { font-size: 18px; font-weight: bold; display: block; color: var(--text); }
+        
+        .empty-msg { grid-column: span 2; text-align: center; padding: 20px; color: var(--success); font-weight: bold; font-size: 1.1em; }
 
-        .action-buttons { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
-        .btn-action {
-            background-color: var(--accent);
-            color: #1e1e24;
-            border: none;
-            padding: 12px 24px;
-            font-size: 1.1em;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .footer-status {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 0.85em;
-            color: var(--text-dim);
-            font-style: italic;
-        }
+        @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header-controls">
-        <select class="header-select" id="langSelect" onchange="changeLanguage()">
-            <option value="en">EN</option>
-            <option value="fr">FR</option>
-        </select>
-        <button class="header-btn" onclick="toggleTheme()">☀️/🌙</button>
-    </div>
-
-    <h1 id="mainTitle">Steel Logistics Suite</h1>
-
-    <div class="controls main-inputs">
-        <div class="input-group">
-            <label id="inputLabel">Target Steel:</label>
-            <div style="display: flex; gap: 8px;">
-                <div class="input-wrapper" style="width: 180px;">
-                    <input type="number" id="steelInput" value="7000" oninput="debouncedCalculate()">
-                    <span id="inputSuffix1" class="input-suffix">Units</span>
-                </div>
-                <button class="header-btn" onclick="calculateMaxFromBank()">⚡ Max</button>
+<div class="dashboard">
+    <div class="sidebar">
+        <div class="module">
+            <div class="module-header" id="ui_interface">Interface</div>
+            <div class="input-row">
+                <select id="lang" onchange="changeLang()" style="width: 100%; margin-bottom: 10px;">
+                    <option value="en">🇬🇧 English</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="pt">🇵🇹 Português</option>
+                    <option value="de">🇩🇪 Deutsch</option>
+                </select>
             </div>
+            <button class="btn-theme" id="ui_themeToggle" onclick="toggleTheme()">☀️ / 🌙 Toggle Day/Night Mode</button>
+            <div class="input-row"><label id="ui_format">Display Format</label>
+                <select id="mode" onchange="handleModeChange()">
+                    <option value="units" id="ui_optUnits">Units</option>
+                    <option value="stacks" id="ui_optStacks">Stacks (10k)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="module">
+            <div class="module-header" id="ui_prodCmd">Production Command</div>
+            <div class="input-row">
+                <label id="ui_target">Target Steel</label>
+                <div style="display:flex; gap: 5px;">
+                    <input type="number" id="targetSteel" value="7000" oninput="run()">
+                    <button class="btn-stack" id="ui_btnMax" onclick="calculateMax()" style="min-width: auto;">⚡ Max</button>
+                </div>
+            </div>
+            <div class="input-row"><label id="ui_crafters">Crafters</label><input type="number" id="crafters" value="1" oninput="run()"></div>
+        </div>
+
+        <div class="module">
+            <div class="module-header" id="ui_yieldMods">Yield Modifiers</div>
+            <div class="input-row"><label id="ui_mastery">Mastery (+6%)</label><input type="checkbox" id="modMast" onchange="run()" checked></div>
+            <div class="input-row"><label id="ui_refining">Refining (+3%)</label><input type="checkbox" id="modRef" onchange="run()" checked></div>
+            <div class="input-row"><label id="ui_extraction">Extraction (+3%)</label><input type="checkbox" id="modExt" onchange="run()" checked></div>
+        </div>
+
+        <div class="module">
+            <div class="module-header" id="ui_logStats">Logistics Stats</div>
+            <div class="input-row"><span id="ui_totalStacksLabel">Total Gather Stacks:</span> <span id="statStacks" class="stat-val">0.00</span></div>
         </div>
         
-        <div class="input-group">
-            <label id="displayLabel">Format:</label>
-            <select id="displayMode" class="header-select" onchange="handleModeChange()" style="width:180px">
-                <option value="units">Units</option>
-                <option value="stacks">Stacks (10k)</option>
-            </select>
+        <button class="btn-stack" id="ui_btnDiscord" onclick="copyDiscord()" style="width:100%; padding:12px; font-size:13px;">📋 Copy Discord Order</button>
+        <div id="saveStatus" style="text-align:center; margin-top:10px; font-size:11px; color:var(--text-dim);">Ready</div>
+    </div>
+
+    <div class="main">
+        <div class="module">
+            <div class="module-header"><span id="ui_invBank">Inventory Bank</span> <button class="btn-stack btn-danger" id="ui_btnReset" onclick="clearAll()">Reset All Values</button></div>
+            <table class="bank-table" id="bankTable"></table>
         </div>
 
-        <div class="input-group">
-            <label id="crafterLabel">Crafters:</label>
-            <div class="input-wrapper" style="width: 100px;">
-                <input type="number" id="crafterCount" value="1" oninput="debouncedCalculate()">
-            </div>
+        <div class="module">
+            <div class="module-header" id="ui_defGather">Deficit to Gather</div>
+            <div id="gatherOutput" class="logistics-grid"></div>
+        </div>
+
+        <div class="module">
+            <div class="module-header" id="ui_mfgPipe">Manufacturing Pipeline</div>
+            <div id="stepsOutput"></div>
         </div>
     </div>
-
-    <div class="bonus-toggles">
-        <label><input type="checkbox" id="chkMastery" onchange="debouncedCalculate()"> Mastery (+6%)</label>
-        <label><input type="checkbox" id="chkExtract" onchange="debouncedCalculate()"> Extract (+3%)</label>
-        <label><input type="checkbox" id="chkRefine" onchange="debouncedCalculate()"> Refine (+3%)</label>
-    </div>
-
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 id="marketTitle">Materials Bank</h2>
-        <button class="header-btn" onclick="clearBank()" style="font-size: 0.8em;">🗑️ Clear Bank</button>
-    </div>
-    
-    <div class="inventory-grid">
-        <div class="inv-header">Resource</div><div class="inv-header">Price/10k</div><div class="inv-header">In Bank</div>
-        <div style="text-align:right">Granum</div><div class="inv-cell"><input type="number" id="priceGranum" value="15" oninput="debouncedCalculate()">g</div><div class="inv-cell"><input type="number" id="bankGranum" oninput="debouncedCalculate()"><span class="inputSuffix2 text-dim"></span></div>
-        <div style="text-align:right">Calx</div><div class="inv-cell"><input type="number" id="priceCalx" value="35" oninput="debouncedCalculate()">g</div><div class="inv-cell"><input type="number" id="bankCalx" oninput="debouncedCalculate()"><span class="inputSuffix2 text-dim"></span></div>
-        <div style="text-align:right">Saburra</div><div class="inv-cell"><input type="number" id="priceSaburra" value="15" oninput="debouncedCalculate()">g</div><div class="inv-cell"><input type="number" id="bankSaburra" oninput="debouncedCalculate()"><span class="inputSuffix2 text-dim"></span></div>
-        <div style="text-align:right">Water</div><div class="inv-cell"><input type="number" id="priceWater" value="1" oninput="debouncedCalculate()">g</div><div class="inv-cell"><input type="number" id="bankWater" oninput="debouncedCalculate()"><span class="inputSuffix2 text-dim"></span></div>
-    </div>
-
-    <h2 id="intBankTitle">Components Bank</h2>
-    <div class="intermediate-grid">
-        <div style="text-align:right">Sab. Pwdr</div><div class="inv-cell"><input type="number" id="bankSabPowder" oninput="debouncedCalculate()"></div>
-        <div style="text-align:right">Calx Pwdr</div><div class="inv-cell"><input type="number" id="bankCalxPowder" oninput="debouncedCalculate()"></div>
-        <div style="text-align:right">Coal</div><div class="inv-cell"><input type="number" id="bankCoal" oninput="debouncedCalculate()"></div>
-        <div style="text-align:right">Coke</div><div class="inv-cell"><input type="number" id="bankCoke" oninput="debouncedCalculate()"></div>
-        <div style="text-align:right">Pig Iron</div><div class="inv-cell"><input type="number" id="bankPigIron" oninput="debouncedCalculate()"></div>
-        <div style="text-align:right">Grain Steel</div><div class="inv-cell"><input type="number" id="bankGrainSteel" oninput="debouncedCalculate()"></div>
-    </div>
-
-    <h2 id="rawTitle">Logistics: To Gather</h2>
-    <div class="summary-box" id="rawMaterials"></div>
-    <div class="cost-box" id="costSummary"></div>
-
-    <h2 id="stepsTitle">Instructions</h2>
-    <div class="steps" id="stepList"></div>
-
-    <div class="action-buttons">
-        <button class="btn-action" onclick="copyToDiscord()" id="btnDiscord">📋 Discord</button>
-        <button class="btn-action" onclick="exportCSV()">📊 CSV</button>
-    </div>
-
-    <div class="footer-status" id="saveStatus">Initializing...</div>
 </div>
 
 <script>
-    let currentLang = 'en';
-    let previousMode = 'units';
-    let calcTimeout = null;
-
-    const text = {
+    const i18n = {
         en: {
-            req: "Req", bank: "Bank", gather: "Gather", total: "Total Cost", perStk: "Cost/Stack",
-            noMats: "✅ Bank covers everything!", awaiting: "Set Target..."
+            interface: "Interface", themeToggle: "☀️ / 🌙 Toggle Day/Night Mode", format: "Display Format", optUnits: "Units", optStacks: "Stacks (10k)",
+            prodCmd: "Production Command", target: "Target Steel", btnMax: "⚡ Max", crafters: "Crafters",
+            yieldMods: "Yield Modifiers", mastery: "Mastery (+6%)", refining: "Refining (+3%)", extraction: "Extraction (+3%)",
+            logStats: "Logistics Stats", totalStacksLabel: "Total Gather Stacks:", btnDiscord: "📋 Copy Discord Order",
+            invBank: "Inventory Bank", btnReset: "Reset All Values", defGather: "Deficit to Gather", mfgPipe: "Manufacturing Pipeline",
+            noTarget: "No target set.", allCovered: "✅ Bank covers all raw materials!",
+            items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Water", sp: "Saburra Pwdr", cp: "Calx Pwdr", coal: "Coal", coke: "Coke", pi: "Pig Iron", gs: "Grain Steel", steel: "Steel", bo: "Blood Ore" },
+            stepGrind: "Grind", stepCrush: "Crush", stepAttract: "Attract", stepFurnace: "Furnace", stepOven: "Oven", stepFinal: "Final Oven:",
+            stepTo: "to", stepYields: "yields", stepPlus: "+", perCrafter: "(Per Crafter)",
+            resetPrompt: "Reset everything to zero?", discHeader: "⚔️ LOGISTICS ORDER: STEEL ⚔️", discLoad: "Total Stacks:", discReq: "REQUIRED MATERIALS:", discStock: "All materials in stock.", discCopied: "Copied to clipboard!"
         },
         fr: {
-            req: "Req", bank: "Banque", gather: "Récolter", total: "Coût Total", perStk: "Coût/Stack",
-            noMats: "✅ La banque couvre tout !", awaiting: "Définir l'objectif..."
+            interface: "Interface", themeToggle: "☀️ / 🌙 Mode Jour/Nuit", format: "Format d'affichage", optUnits: "Unités", optStacks: "Stacks (10k)",
+            prodCmd: "Commandes de Production", target: "Objectif d'Acier", btnMax: "⚡ Max", crafters: "Artisans",
+            yieldMods: "Modificateurs", mastery: "Maîtrise (+6%)", refining: "Raffinage (+3%)", extraction: "Extraction (+3%)",
+            logStats: "Statistiques Logistiques", totalStacksLabel: "Stacks Totaux à Récolter :", btnDiscord: "📋 Copier pour Discord",
+            invBank: "Banque d'Inventaire", btnReset: "Réinitialiser", defGather: "Déficit à Récolter", mfgPipe: "Processus de Fabrication",
+            noTarget: "Aucun objectif défini.", allCovered: "✅ La banque couvre toutes les matières premières !",
+            items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Eau", sp: "Poudre Saburra", cp: "Poudre Calx", coal: "Charbon", coke: "Coke", pi: "Fonte (Pig Iron)", gs: "Acier Brut (Grain Steel)", steel: "Acier", bo: "Minerai de Sang" },
+            stepGrind: "Broyer", stepCrush: "Concasser", stepAttract: "Attirer", stepFurnace: "Fourneau", stepOven: "Four", stepFinal: "Fourneau Final:",
+            stepTo: "en", stepYields: "produit", stepPlus: "+", perCrafter: "(Par Artisan)",
+            resetPrompt: "Tout remettre à zéro ?", discHeader: "⚔️ ORDRE LOGISTIQUE : ACIER ⚔️", discLoad: "Stacks Totaux :", discReq: "MATÉRIAUX REQUIS :", discStock: "Tous les matériaux sont en stock.", discCopied: "Copié dans le presse-papiers !"
+        },
+        es: {
+            interface: "Interfaz", themeToggle: "☀️ / 🌙 Modo Día/Noche", format: "Formato de visualización", optUnits: "Unidades", optStacks: "Stacks (10k)",
+            prodCmd: "Producción", target: "Objetivo de Acero", btnMax: "⚡ Max", crafters: "Artesanos",
+            yieldMods: "Modificadores", mastery: "Maestría (+6%)", refining: "Refinación (+3%)", extraction: "Extracción (+3%)",
+            logStats: "Estadísticas Logísticas", totalStacksLabel: "Stacks Totales:", btnDiscord: "📋 Copiar para Discord",
+            invBank: "Banco de Inventario", btnReset: "Reiniciar Todo", defGather: "Déficit a Recolectar", mfgPipe: "Proceso de Fabricación",
+            noTarget: "Sin objetivo.", allCovered: "✅ ¡El banco cubre todas las materias primas!",
+            items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Agua", sp: "Polvo Saburra", cp: "Polvo Calx", coal: "Carbón", coke: "Coque", pi: "Arrabio", gs: "Acero Grano", steel: "Acero", bo: "Mineral de Sangre" },
+            stepGrind: "Moler", stepCrush: "Triturar", stepAttract: "Atraer", stepFurnace: "Horno", stepOven: "Horno Ref.", stepFinal: "Horno Final:",
+            stepTo: "a", stepYields: "produce", stepPlus: "+", perCrafter: "(Por Artesano)",
+            resetPrompt: "¿Restablecer todo a cero?", discHeader: "⚔️ ORDEN LOGÍSTICA: ACERO ⚔️", discLoad: "Stacks Totales:", discReq: "MATERIALES REQUERIDOS:", discStock: "Todos los materiales en stock.", discCopied: "¡Copiado al portapapeles!"
+        },
+        pt: {
+            interface: "Interface", themeToggle: "☀️ / 🌙 Modo Dia/Noite", format: "Formato de Exibição", optUnits: "Unidades", optStacks: "Stacks (10k)",
+            prodCmd: "Produção", target: "Meta de Aço", btnMax: "⚡ Max", crafters: "Artesãos",
+            yieldMods: "Modificadores", mastery: "Maestria (+6%)", refining: "Refino (+3%)", extraction: "Extração (+3%)",
+            logStats: "Estatísticas Logísticas", totalStacksLabel: "Stacks Totais:", btnDiscord: "📋 Copiar para Discord",
+            invBank: "Banco de Inventário", btnReset: "Zerar Tudo", defGather: "Déficit para Coletar", mfgPipe: "Processo de Fabricação",
+            noTarget: "Nenhuma meta.", allCovered: "✅ O banco cobre todas as matérias-primas!",
+            items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Água", sp: "Pó de Sab.", cp: "Pó de Calx", coal: "Carvão", coke: "Coque", pi: "Ferro-Gusa", gs: "Aço Grão", steel: "Aço", bo: "Minério de Sangue" },
+            stepGrind: "Moer", stepCrush: "Triturar", stepAttract: "Atrair", stepFurnace: "Fornalha", stepOven: "Forno", stepFinal: "Forno Final:",
+            stepTo: "para", stepYields: "produz", stepPlus: "+", perCrafter: "(Por Artesão)",
+            resetPrompt: "Zerar tudo?", discHeader: "⚔️ ORDEM LOGÍSTICA: AÇO ⚔️", discLoad: "Stacks Totais:", discReq: "MATERIAIS NECESSÁRIOS:", discStock: "Todos os materiais em estoque.", discCopied: "Copiado!"
+        },
+        de: {
+            interface: "Schnittstelle", themeToggle: "☀️ / 🌙 Tag/Nacht-Modus", format: "Anzeigeformat", optUnits: "Einheiten", optStacks: "Stacks (10k)",
+            prodCmd: "Produktion", target: "Ziel-Stahl", btnMax: "⚡ Max", crafters: "Handwerker",
+            yieldMods: "Modifikatoren", mastery: "Meisterschaft (+6%)", refining: "Raffination (+3%)", extraction: "Extraktion (+3%)",
+            logStats: "Logistik-Statistiken", totalStacksLabel: "Gesamte Stacks:", btnDiscord: "📋 Für Discord kopieren",
+            invBank: "Inventarbank", btnReset: "Alles zurücksetzen", defGather: "Sammeldefizit", mfgPipe: "Herstellungsprozess",
+            noTarget: "Kein Ziel festgelegt.", allCovered: "✅ Bank deckt alle Rohstoffe ab!",
+            items: { granum: "Granum", calx: "Calx", saburra: "Saburra", water: "Wasser", sp: "Saburra-Pulver", cp: "Calx-Pulver", coal: "Kohle", coke: "Koks", pi: "Roheisen", gs: "Kornstahl", steel: "Stahl", bo: "Bluterz" },
+            stepGrind: "Mahlen", stepCrush: "Zerkleinern", stepAttract: "Anziehen", stepFurnace: "Ofen", stepOven: "Raffinierofen", stepFinal: "Letzter Ofen:",
+            stepTo: "zu", stepYields: "ergibt", stepPlus: "+", perCrafter: "(Pro Handwerker)",
+            resetPrompt: "Alles auf null setzen?", discHeader: "⚔️ LOGISTIK-AUFTRAG: STAHL ⚔️", discLoad: "Gesamte Stacks:", discReq: "BENÖTIGTE MATERIALIEN:", discStock: "Alle Materialien auf Lager.", discCopied: "Kopiert!"
         }
     };
 
-    // --- DEBOUNCE LOGIC ---
-    function debouncedCalculate() {
-        clearTimeout(calcTimeout);
-        calcTimeout = setTimeout(() => {
-            calculate();
-        }, 150);
-    }
+    let timer = null;
+    let prevMode = 'units';
+    let currentLang = 'en';
 
-    // --- SAVING & THEME ---
-    function toggleTheme() { 
-        document.body.classList.toggle('light-theme'); 
-        saveToLocalStorage();
-    }
+    const itemKeys = ['granum', 'calx', 'saburra', 'water', 'sp', 'cp', 'coal', 'coke', 'pi', 'gs'];
 
-    function saveToLocalStorage() {
-        const ids = [
-            'steelInput', 'displayMode', 'crafterCount', 'priceGranum', 'priceCalx', 
-            'priceSaburra', 'priceWater', 'bankGranum', 'bankCalx', 'bankSaburra', 
-            'bankWater', 'bankSabPowder', 'bankCalxPowder', 'bankCoal', 'bankCoke', 
-            'bankPigIron', 'bankGrainSteel'
-        ];
-        const data = {};
-        ids.forEach(id => data[id] = document.getElementById(id).value);
-        data.chkMastery = document.getElementById('chkMastery').checked;
-        data.chkExtract = document.getElementById('chkExtract').checked;
-        data.chkRefine = document.getElementById('chkRefine').checked;
-        data.lang = document.getElementById('langSelect').value;
-        data.theme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
+    function changeLang() {
+        currentLang = document.getElementById('lang').value;
+        const t = i18n[currentLang];
         
-        localStorage.setItem('steelSuite_Save', JSON.stringify(data));
+        document.getElementById('ui_interface').innerText = t.interface;
+        document.getElementById('ui_themeToggle').innerText = t.themeToggle;
+        document.getElementById('ui_format').innerText = t.format;
+        document.getElementById('ui_optUnits').innerText = t.optUnits;
+        document.getElementById('ui_optStacks').innerText = t.optStacks;
+        document.getElementById('ui_prodCmd').innerText = t.prodCmd;
+        document.getElementById('ui_target').innerText = t.target;
+        document.getElementById('ui_btnMax').innerText = t.btnMax;
+        document.getElementById('ui_crafters').innerText = t.crafters;
+        document.getElementById('ui_yieldMods').innerText = t.yieldMods;
+        document.getElementById('ui_mastery').innerText = t.mastery;
+        document.getElementById('ui_refining').innerText = t.refining;
+        document.getElementById('ui_extraction').innerText = t.extraction;
+        document.getElementById('ui_logStats').innerText = t.logStats;
+        document.getElementById('ui_totalStacksLabel').innerText = t.totalStacksLabel;
+        document.getElementById('ui_btnDiscord').innerText = t.btnDiscord;
+        document.getElementById('ui_invBank').innerText = t.invBank;
+        document.getElementById('ui_btnReset').innerText = t.btnReset;
+        document.getElementById('ui_defGather').innerText = t.defGather;
         
-        const now = new Date();
-        document.getElementById('saveStatus').innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+        renderBankTable();
+        updateButtonLabels();
+        run();
     }
 
-    function loadFromLocalStorage() {
-        const saved = localStorage.getItem('steelSuite_Save');
-        if (!saved) return;
-        const d = JSON.parse(saved);
-        Object.keys(d).forEach(id => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            if (el.type === 'checkbox') el.checked = d[id];
-            else el.value = d[id];
+    function renderBankTable() {
+        const table = document.getElementById('bankTable');
+        const t = i18n[currentLang];
+        
+        const currentVals = {};
+        itemKeys.forEach(k => {
+            const el = document.getElementById('b_' + k);
+            if (el) currentVals[k] = el.value;
         });
-        if (d.theme === 'light') document.body.classList.add('light-theme');
-        if (d.lang) currentLang = d.lang;
-        previousMode = d.displayMode || 'units';
+
+        table.innerHTML = ""; 
+        itemKeys.forEach(k => {
+            const val = currentVals[k] || 0;
+            table.innerHTML += `<tr>
+                <td style="font-weight:bold">${t.items[k]}</td>
+                <td style="text-align:right">
+                    <input type="number" id="b_${k}" value="${val}" oninput="run()">
+                    <button class="btn-stack q-add" id="btn_${k}" onclick="quickAdd('b_${k}', 10000)">+10k</button>
+                </td>
+            </tr>`;
+        });
     }
 
-    // --- CALCULATOR CORE ---
-    function getCalculations(desiredSteel) {
-        const mode = document.getElementById('displayMode').value;
-        const getBank = (id) => mode === 'stacks' ? (Number(document.getElementById(id).value)||0) * 10000 : (Number(document.getElementById(id).value)||0);
-        
-        const b = {
-            granum: getBank('bankGranum'), calx: getBank('bankCalx'), saburra: getBank('bankSaburra'), water: getBank('bankWater'),
-            sp: getBank('bankSabPowder'), cp: getBank('bankCalxPowder'), coal: getBank('bankCoal'), coke: getBank('bankCoke'),
-            pi: getBank('bankPigIron'), gs: getBank('bankGrainSteel')
-        };
-
-        const mE = document.getElementById('chkExtract').checked ? 1.03 : 1;
-        const mR = document.getElementById('chkRefine').checked ? 1.03 : 1;
-        const mM = document.getElementById('chkMastery').checked ? 1.06 : 1;
-
-        // Simplified Tree Logic
-        const reqGS = Math.ceil(desiredSteel / (0.7 * mR));
-        const diffGS = Math.max(0, reqGS - b.gs);
-        
-        const reqPI = Math.ceil(diffGS / (0.7 * mR));
-        const diffPI = Math.max(0, reqPI - b.pi);
-        
-        const reqBlood = Math.ceil(diffPI / (0.4 * mR));
-        const reqGranum = Math.ceil(reqBlood / (0.198 * mE * mM));
-        const defGranum = Math.max(0, reqGranum - b.granum);
-
-        // ... Add secondary materials like Calx/Saburra Powder requirements here ...
-        // (Simplified for demo, but includes the Heat-Map trigger)
-        
-        return {
-            reqGranum, defGranum, bGranum: b.granum,
-            reqCalx: 0, defCalx: 0, bCalx: b.calx, // Placeholders for full logic
-            reqSaburra: 0, defSaburra: 0, bSaburra: b.saburra,
-            reqWater: 0, defWater: 0, bWater: b.water,
-            defCost: (defGranum/10000) * Number(document.getElementById('priceGranum').value)
-        };
+    function init() {
+        load(); 
+        document.getElementById('lang').value = currentLang;
+        changeLang(); 
     }
 
-    function calculate() {
-        const mode = document.getElementById('displayMode').value;
-        const inputVal = Number(document.getElementById('steelInput').value) || 0;
-        const target = mode === 'stacks' ? inputVal * 10000 : inputVal;
-        const t = text[currentLang];
-        const c = getCalculations(target);
-
-        // --- HEAT MAP LOGIC ---
-        const getHmClass = (val) => {
-            if (val <= 0) return 'hm-gray';
-            if (val < 10000) return 'hm-yellow';
-            return 'hm-red';
-        };
-
-        let matsHTML = '';
-        const makeCol = (name, req, bank, def) => `
-            <div class="summary-col">
-                <div class="req-val">${formatAmount(req)} ${t.req}</div>
-                <div class="bank-val">${formatAmount(bank)} ${t.bank}</div>
-                <div class="def-val ${getHmClass(def)}">${formatAmount(def)} ${t.gather}</div>
-                <div style="font-weight:bold; font-size:0.8em">${name}</div>
-            </div>`;
-
-        matsHTML += makeCol("Granum", c.reqGranum, c.bGranum, c.defGranum);
-        document.getElementById('rawMaterials').innerHTML = matsHTML;
-        
-        document.getElementById('costSummary').innerHTML = `
-            <div>${t.total}: <strong>${c.defCost.toFixed(1)}g</strong></div>
-            <div>${t.perStk}: <strong>${(c.defCost/(target/10000 || 1)).toFixed(1)}g</strong></div>
-        `;
-
-        saveToLocalStorage();
+    function toggleTheme() {
+        document.body.classList.toggle('light-theme');
+        save();
     }
 
-    function formatAmount(num) {
-        const mode = document.getElementById('displayMode').value;
-        if (mode === 'stacks') return (num / 10000).toFixed(2) + " Stk";
-        return num.toLocaleString();
+    function updateButtonLabels() {
+        const mode = document.getElementById('mode').value;
+        const label = mode === 'stacks' ? '+1 Stk' : '+10k';
+        document.querySelectorAll('.q-add').forEach(btn => btn.innerText = label);
     }
 
-    function clearBank() {
-        if (confirm("Reset bank to zero?")) {
-            const ids = ['bankGranum','bankCalx','bankSaburra','bankWater','bankSabPowder','bankCalxPowder','bankCoal','bankCoke','bankPigIron','bankGrainSteel'];
-            ids.forEach(id => document.getElementById(id).value = 0);
-            calculate();
+    function quickAdd(id, amt) {
+        const el = document.getElementById(id);
+        const mode = document.getElementById('mode').value;
+        let current = Number(el.value) || 0;
+        el.value = mode === 'stacks' ? parseFloat((current + 1).toFixed(4)) : current + 10000;
+        run();
+    }
+
+    function clearAll() {
+        const t = i18n[currentLang];
+        if(confirm(t.resetPrompt)) {
+            itemKeys.forEach(k => {
+                const el = document.getElementById('b_' + k);
+                if(el) el.value = 0;
+            });
+            document.getElementById('targetSteel').value = 0;
+            
+            // Explicitly wipe the visual elements to ensure UI feedback
+            document.getElementById('gatherOutput').innerHTML = `<div class="empty-msg">${t.noTarget}</div>`;
+            document.getElementById('stepsOutput').innerHTML = "";
+            document.getElementById('statStacks').innerText = "0.00";
+            run();
         }
     }
 
     function handleModeChange() {
-        const newMode = document.getElementById('displayMode').value;
-        const ids = ['steelInput','bankGranum','bankCalx','bankSaburra','bankWater','bankSabPowder','bankCalxPowder','bankCoal','bankCoke','bankPigIron','bankGrainSteel'];
-        ids.forEach(id => {
-            const el = document.getElementById(id);
-            let v = Number(el.value) || 0;
-            if (previousMode === 'units' && newMode === 'stacks') v /= 10000;
-            else if (previousMode === 'stacks' && newMode === 'units') v *= 10000;
-            el.value = v === 0 ? "" : parseFloat(v.toFixed(4));
+        const mode = document.getElementById('mode').value;
+        const targetEl = document.getElementById('targetSteel');
+        let targetVal = Number(targetEl.value) || 0;
+        
+        if (prevMode === 'units' && mode === 'stacks') targetEl.value = (targetVal / 10000).toFixed(4);
+        else if (prevMode === 'stacks' && mode === 'units') targetEl.value = Math.round(targetVal * 10000);
+
+        itemKeys.forEach(k => {
+            const el = document.getElementById('b_' + k);
+            if(el) {
+                let val = Number(el.value) || 0;
+                if (prevMode === 'units' && mode === 'stacks') el.value = (val / 10000).toFixed(4);
+                else if (prevMode === 'stacks' && mode === 'units') el.value = Math.round(val * 10000);
+            }
         });
-        previousMode = newMode;
-        calculate();
+
+        updateButtonLabels();
+        prevMode = mode;
+        run();
     }
 
-    window.onload = () => {
-        loadFromLocalStorage();
-        calculate();
-    };
+    function run() { clearTimeout(timer); timer = setTimeout(calculate, 150); }
+
+    function runEngine(targetRaw, bankData, mode) {
+        const mult = mode === 'stacks' ? 10000 : 1;
+        const target = targetRaw * mult;
+        
+        const mR = document.getElementById('modRef').checked ? 1.03 : 1;
+        const mE = document.getElementById('modExt').checked ? 1.03 : 1;
+        const mM = document.getElementById('modMast').checked ? 1.06 : 1;
+
+        const rGS = Math.ceil(target / (0.7 * mR));
+        const coalForSteel = Math.ceil(rGS * 0.5);
+        const spForSteel = Math.ceil(rGS * 0.5);
+        const diffGS = Math.max(0, rGS - bankData.gs);
+
+        const rPI = Math.ceil(diffGS / (0.7 * mR));
+        const cokeForGS = Math.ceil(rPI * 0.5);
+        const cpForGS = Math.ceil(rPI * 0.5);
+        const diffPI = Math.max(0, rPI - bankData.pi);
+
+        const rBlood = Math.ceil(diffPI / (0.4 * mR));
+        const cokeForPI = Math.ceil(rBlood * 0.0385);
+        
+        const totalCoke = cokeForGS + cokeForPI;
+        const diffCoke = Math.max(0, totalCoke - bankData.coke);
+
+        const coalForCoke = Math.ceil(diffCoke / (0.72 * mR));
+        const cpForCoke = Math.ceil(coalForCoke * 0.0715);
+
+        const totalCoal = coalForSteel + coalForCoke;
+        const diffCoal = Math.max(0, totalCoal - bankData.coal);
+
+        const rGranum = Math.ceil(rBlood / (0.198 * mE * mM));
+        const cpForBlood = Math.ceil(rGranum * 0.0715);
+
+        const totalCP = cpForGS + cpForCoke + cpForBlood;
+        const diffCP = Math.max(0, totalCP - bankData.cp);
+
+        const diffSP = Math.max(0, spForSteel - bankData.sp);
+
+        const rSaburra = Math.ceil(diffSP / (0.4275 * mE));
+        const waterForSaburra = Math.ceil(rSaburra * 0.1);
+
+        const calxToGrind = Math.ceil(diffCP / (0.2058 * mE));
+        const waterForCalx = Math.ceil(calxToGrind * 0.1);
+        const coalFromGrind = Math.ceil(calxToGrind * 0.1140 * mE);
+
+        const extraCoal = Math.max(0, diffCoal - coalFromGrind);
+        const calxToCrush = Math.ceil(extraCoal / (0.2160 * mE));
+
+        const rCalx = calxToGrind + calxToCrush;
+        const rWater = waterForSaburra + waterForCalx;
+
+        return {
+            granum: Math.max(0, rGranum - bankData.granum),
+            calx: Math.max(0, rCalx - bankData.calx),
+            saburra: Math.max(0, rSaburra - bankData.saburra),
+            water: Math.max(0, rWater - bankData.water),
+            reqGS: rGS, coalForSteel, spForSteel, diffGS,
+            rPI, cokeForGS, cpForGS, diffPI,
+            rBlood, cokeForPI, diffCoke,
+            coalForCoke, cpForCoke, diffCoal,
+            rGranum, cpForBlood, diffCP,
+            diffSP, rSaburra, waterForSaburra,
+            calxToGrind, waterForCalx, coalFromGrind,
+            extraCoal, calxToCrush, target
+        };
+    }
+
+    function calculateMax() {
+        const mode = document.getElementById('mode').value;
+        const mult = mode === 'stacks' ? 10000 : 1;
+        const getB = (id) => (Number(document.getElementById('b_' + id).value) || 0) * mult;
+        const bank = {}; itemKeys.forEach(k => bank[k] = getB(k));
+
+        let low = 0, high = 1000000 * mult, maxPossible = 0;
+        
+        while(low <= high) {
+            let mid = Math.floor((low + high) / 2);
+            let res = runEngine(mid / mult, bank, mode);
+            
+            // If the deficit for all RAW materials is <= 0, we can make it with current bank
+            if (res.granum <= 0 && res.calx <= 0 && res.saburra <= 0 && res.water <= 0) {
+                maxPossible = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        
+        document.getElementById('targetSteel').value = mode === 'stacks' ? parseFloat((maxPossible / 10000).toFixed(4)) : maxPossible;
+        run(); // Instantly update UI pipeline with the new Max Target
+    }
+
+    function calculate() {
+        const mode = document.getElementById('mode').value;
+        const t = i18n[currentLang];
+        const targetRaw = Number(document.getElementById('targetSteel').value) || 0;
+        const crafters = Math.max(1, Number(document.getElementById('crafters').value));
+        
+        const mult = mode === 'stacks' ? 10000 : 1;
+        const getB = (id) => (Number(document.getElementById('b_' + id).value) || 0) * mult;
+        const bank = {}; itemKeys.forEach(k => bank[k] = getB(k));
+
+        if (targetRaw <= 0) {
+            document.getElementById('gatherOutput').innerHTML = `<div class="empty-msg">${t.noTarget}</div>`;
+            document.getElementById('stepsOutput').innerHTML = "";
+            document.getElementById('statStacks').innerText = "0.00";
+            document.getElementById('ui_mfgPipe').innerHTML = t.mfgPipe;
+            save();
+            return;
+        }
+
+        const res = runEngine(targetRaw, bank, mode);
+        const gather = { granum: res.granum, calx: res.calx, saburra: res.saburra, water: res.water };
+
+        let gHTML = '';
+        let hasDeficit = false;
+        let totalUnits = 0;
+
+        Object.keys(gather).forEach(k => {
+            if (gather[k] > 0) {
+                totalUnits += gather[k];
+                const fmtVal = mode === 'stacks' ? (gather[k]/10000).toFixed(2) + " Stk" : gather[k].toLocaleString();
+                const hm = gather[k] < 10000 ? 'hm-low' : 'hm-high';
+                gHTML += `<div class="logistics-item ${hm}"><span>${t.items[k]}</span><span>${fmtVal}</span></div>`;
+                hasDeficit = true;
+            }
+        });
+        document.getElementById('gatherOutput').innerHTML = hasDeficit ? gHTML : `<div class="empty-msg">${t.allCovered}</div>`;
+
+        const totalStacks = (totalUnits / 10000).toFixed(2);
+        document.getElementById('statStacks').innerText = totalStacks;
+
+        const crafterTag = crafters > 1 ? ` <span style="color:var(--warning); font-size:0.8em; margin-left:10px;">${t.perCrafter}</span>` : "";
+        document.getElementById('ui_mfgPipe').innerHTML = t.mfgPipe + crafterTag;
+
+        // Detailed Steps Reconstruction
+        const s = (v) => Math.ceil(v / crafters).toLocaleString();
+        let steps = [];
+        if (res.rSaburra > 0) steps.push(`${t.stepGrind} <span class="highlight">${s(res.rSaburra)} ${t.items.saburra}</span> ${t.stepPlus} <span class="highlight">${s(res.waterForSaburra)} ${t.items.water}</span> ${t.stepYields} <span class="highlight">${s(res.diffSP)} ${t.items.sp}</span>`);
+        if (res.calxToGrind > 0) steps.push(`${t.stepGrind} <span class="highlight">${s(res.calxToGrind)} ${t.items.calx}</span> ${t.stepPlus} <span class="highlight">${s(res.waterForCalx)} ${t.items.water}</span> ${t.stepYields} <span class="highlight">${s(res.diffCP)} ${t.items.cp}</span> ${t.stepPlus} <span class="highlight">${s(res.coalFromGrind)} ${t.items.coal}</span>`);
+        if (res.calxToCrush > 0) steps.push(`${t.stepCrush} <span class="highlight">${s(res.calxToCrush)} ${t.items.calx}</span> ${t.stepYields} <span class="highlight">${s(res.extraCoal)} ${t.items.coal}</span>`);
+        if (res.rGranum > 0) steps.push(`${t.stepAttract}: <span class="highlight">${s(res.rGranum)} ${t.items.granum}</span> ${t.stepPlus} <span class="highlight">${s(res.cpForBlood)} ${t.items.cp}</span> ${t.stepYields} <span class="highlight">${s(res.rBlood)} ${t.items.bo}</span>`);
+        if (res.diffCoke > 0) steps.push(`${t.stepFurnace}: <span class="highlight">${s(res.coalForCoke)} ${t.items.coal}</span> ${t.stepPlus} <span class="highlight">${s(res.cpForCoke)} ${t.items.cp}</span> ${t.stepYields} <span class="highlight">${s(res.diffCoke)} ${t.items.coke}</span>`);
+        if (res.diffPI > 0) steps.push(`${t.stepFurnace}: <span class="highlight">${s(res.rBlood)} ${t.items.bo}</span> ${t.stepPlus} <span class="highlight">${s(res.cokeForPI)} ${t.items.coke}</span> ${t.stepYields} <span class="highlight">${s(res.diffPI)} ${t.items.pi}</span>`);
+        if (res.diffGS > 0) steps.push(`${t.stepOven}: <span class="highlight">${s(res.diffPI)} ${t.items.pi}</span> ${t.stepPlus} <span class="highlight">${s(res.cokeForGS)} ${t.items.coke}</span> ${t.stepPlus} <span class="highlight">${s(res.cpForGS)} ${t.items.cp}</span> ${t.stepYields} <span class="highlight">${s(res.diffGS)} ${t.items.gs}</span>`);
+        steps.push(`${t.stepFinal} <span class="highlight">${s(res.reqGS)} ${t.items.gs}</span> ${t.stepPlus} <span class="highlight">${s(res.coalForSteel)} ${t.items.coal}</span> ${t.stepPlus} <span class="highlight">${s(res.spForSteel)} ${t.items.sp}</span> ${t.stepYields} <span class="highlight">${(targetRaw * mult).toLocaleString()} ${t.items.steel}</span>`);
+        
+        document.getElementById('stepsOutput').innerHTML = steps.map(text => `<div class="step-card">${text}</div>`).join('');
+        save();
+    }
+
+    function save() {
+        const data = {};
+        document.querySelectorAll('input:not([type="checkbox"]), select').forEach(el => data[el.id] = el.value);
+        document.querySelectorAll('input[type="checkbox"]').forEach(el => data[el.id] = el.checked);
+        data.theme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
+        data.lang = currentLang;
+        localStorage.setItem('QM_Steel_v4.1', JSON.stringify(data));
+        document.getElementById('saveStatus').innerText = `Saved: ${new Date().toLocaleTimeString()}`;
+    }
+
+    function load() {
+        const d = JSON.parse(localStorage.getItem('QM_Steel_v4.1'));
+        if (!d) return;
+        Object.keys(d).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                if(el.type === 'checkbox') el.checked = d[id];
+                else el.value = d[id];
+            }
+        });
+        if (d.theme === 'light') document.body.classList.add('light-theme');
+        if (d.lang) currentLang = d.lang;
+        prevMode = document.getElementById('mode').value || 'units';
+    }
+
+    function copyDiscord() {
+        const t = i18n[currentLang];
+        const stacks = document.getElementById('statStacks').innerText;
+        let msg = `**${t.discHeader}**\n**${t.discLoad}** ${stacks}\n\n**${t.discReq}**\n\`\`\`\n`;
+        const items = document.querySelectorAll('.logistics-item');
+        if (items.length === 0) msg += `${t.discStock}\n`;
+        items.forEach(el => msg += `- ${el.innerText.replace('\n', ': ')}\n`);
+        msg += `\`\`\``;
+        navigator.clipboard.writeText(msg);
+        alert(t.discCopied);
+    }
+
+    window.onload = init;
 </script>
 </body>
 </html>
