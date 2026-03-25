@@ -2,7 +2,7 @@ const baseItems = {
     granum: "Granum", calx: "Calx", saburra: "Saburra", tephra: "Tephra", bor: "Bor", gabore: "Gabore", kimurite: "Kimurite", lodestone: "Lodestone", risensacrificecarcass: "Risen Sacrifice",
     sp: "Saburra Powder", cp: "Calx Powder", gaborepowder: "Gabore Powder", lodestonepowder: "Lodestone Powder",
     bo: "Blood Ore", gs: "Grain Steel",
-    cuprum: "Cuprum", bron: "Bron", messing: "Messing", messing_bor: "Messing (Bor)", tmessing: "Tindremic Messing", tungsteel: "Tungsteel", cronite: "Cronite", oghmium: "Oghmium",
+    cuprum: "Cuprum", bron: "Bron", messing: "Messing", tmessing: "Tindremic Messing", tungsteel: "Tungsteel", cronite: "Cronite", oghmium: "Oghmium",
     amarantum: "Amarantum", flakestone: "Flakestone", granumpowder: "Granum Powder", malachite: "Malachite", bleckblende: "Bleckblende", calamine: "Calamine",
     jadeite: "Jadeite", calspar: "Calspar", galbinum: "Galbinum", redbleckblende: "Red Bleckblende", pyroxene: "Pyroxene", almine: "Almine", acronite: "Acronite",
     sanguinite: "Sanguinite", fumingsalt: "Fuming Salt", lupium: "Lupium", gemmetal: "Gem Metal",
@@ -100,7 +100,7 @@ const i18n = {
         viewProd: "Commande de Production", viewYield: "Modificateurs de Rendement", viewBank: "Banque d'Inventaire", viewCart: "Panier", viewGather: "Déficit à Récolter", viewPipe: "Pipeline de Fabrication", viewLegend: "Légende des Acronymes", viewLang: "Langue",
         btnBank: "Banque", btnCart: "Panier", btnSettings: "Paramètres", btnActions: "Actions", btnHelp: "Aide",
 
-        legend: "Légende des Acronymes et Priorités", legCP: "CP = Calx Powder", legSP: "SP = Saburra Powder", legBO: "BO = Blood Ore", legPI: "PI = Pig Iron (Fonte)", legGS: "GS = Grain Steel", legStk: "Stk = Pile (10,000 unités)", legBest: "Plus Efficace (Priorité)", legMax: "Max Sous-produits (Priorité)", legRegion: "🌍 = Limitée par Région",
+        legend: "Légende des Acronymes", legCP: "CP = Calx Powder", legSP: "SP = Saburra Powder", legBO: "BO = Blood Ore", legPI: "PI = Pig Iron (Fonte)", legGS: "GS = Grain Steel", legStk: "Stk = Pile (10,000 unités)", legBest: "Plus Efficace (Priorité)", legMax: "Max Sous-produits (Priorité)", legRegion: "🌍 = Limitée par Région",
         prefRoute: "Préférence de Routage Globale", actCart: "Actions du Panier et Banque", actDiscord: "Envoi Discord", actPipe: "Contrôle du Pipeline", viewPers: "Personnalisation", viewVis: "Visibilité des Modules",
 
         categories: { raw: "Matières Premières", basicExt: "Extractions de Base", intOre: "Minerais Intermédiaires", advOre: "Minerais Avancés", catalyst: "Catalyseurs", refined: "Métaux Raffinés" },

@@ -56,9 +56,18 @@ function toggleMainModule(modId, isVisible = null) {
     save();
 }
 
+function setLang(code) {
+    document.getElementById('lang').value = code;
+    changeLang();
+    save();
+}
+
 function changeLang() {
     currentLang = document.getElementById('lang').value;
     const t = i18n[currentLang];
+    
+    document.getElementById('flag_en').classList.toggle('active', currentLang === 'en');
+    document.getElementById('flag_fr').classList.toggle('active', currentLang === 'fr');
     
     const standardElements = [
         'tabPrefs', 'tabInteg', 'tabData', 'tabHelp', 'tabView', 'tabActions', 'resetDesc', 'themeToggle', 'format', 

@@ -14,6 +14,10 @@
 
 <div class="app-header">
     <div class="header-actions">
+        <div class="lang-flags">
+            <span id="flag_en" onclick="setLang('en')" title="English">EN</span>
+            <span id="flag_fr" onclick="setLang('fr')" title="Français">FR</span>
+        </div>
         <button onclick="toggleMainModule('mod_invBank')" id="btnHeaderBank" class="btn-header">🏦 <span id="ui_btnBank">Bank</span></button>
         <button onclick="toggleMainModule('mod_marketCart')" id="btnHeaderCart" class="btn-header">🛒 <span id="ui_btnCart">Cart</span></button>
         <button onclick="openModal('actionsModal')" class="btn-header">⚡ <span id="ui_btnActions">Actions</span></button>
@@ -171,21 +175,42 @@
                     <select id="targetMetal" onchange="run()" style="font-weight: bold; color: var(--accent); width: 160px;">
                         <optgroup label="Refined Metals">
                             <option value="bron">Bron</option>
+                            <option value="cuprum">Cuprum</option>
                             <option value="messing">Messing</option>
-                            <option value="messing_bor">Messing (Bor)</option>
                             <option value="tmessing">Tindremic Messing</option>
                             <option value="steel" selected>Steel</option>
                             <option value="tungsteel">Tungsteel</option>
                             <option value="cronite">Cronite</option>
                             <option value="oghmium">Oghmium</option>
                         </optgroup>
-                        <optgroup label="Catalysts & Intermediates">
-                            <option value="coal">Coal</option>
-                            <option value="coke">Coke</option>
-                            <option value="sp">Saburra Powder</option>
-                            <option value="cp">Calx Powder</option>
+                        <optgroup label="Extracted Metals & Minerals">
+                            <option value="aabam">Aabam</option>
+                            <option value="acronite">Acronite</option>
+                            <option value="almine">Almine</option>
+                            <option value="bleck">Bleck</option>
+                            <option value="calamine">Calamine</option>
+                            <option value="chalkglance">Chalk Glance</option>
+                            <option value="electrum">Electrum</option>
+                            <option value="gemmetal">Gem Metal</option>
+                            <option value="gold">Gold</option>
+                            <option value="kyanite">Kyanite</option>
+                            <option value="lupium">Lupium</option>
+                            <option value="maalite">Maalite</option>
                             <option value="pi">Pig Iron</option>
-                            <option value="gs">Grain Steel</option>
+                            <option value="pyropite">Pyropite</option>
+                            <option value="sanguinite">Sanguinite</option>
+                            <option value="silver">Silver</option>
+                            <option value="skadite">Skadite</option>
+                            <option value="waterstone">Waterstone</option>
+                        </optgroup>
+                        <optgroup label="Catalysts & Powders">
+                            <option value="coke">Coke</option>
+                            <option value="coal">Coal</option>
+                            <option value="cp">Calx Powder</option>
+                            <option value="sp">Saburra Powder</option>
+                            <option value="ichor">Ichor</option>
+                            <option value="sulfur">Sulfur</option>
+                            <option value="pitch">Pitch</option>
                         </optgroup>
                     </select>
                 </div>

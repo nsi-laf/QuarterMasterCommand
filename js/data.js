@@ -5,21 +5,21 @@ const CATEGORIES = [
     { id: 'raw', items: ['granum', 'calx', 'saburra', 'tephra', 'gabore', 'kimurite', 'lodestone', 'water'] },
     { id: 'catalyst', items: ['coal', 'coke', 'sp', 'cp', 'fumingsalt', 'bor', 'rockoil', 'dragonsalt', 'ichor', 'sulfur', 'tallow'] },
     { id: 'basicExt', items: ['granumpowder', 'gaborepowder', 'malachite', 'bleckblende', 'calamine', 'amarantum', 'flakestone', 'calspar', 'jadeite', 'pyrite', 'magmum'] },
-    { id: 'intOre', items: ['bo', 'galbinum', 'pyroxene', 'redbleckblende', 'bleck', 'cinnabar', 'maalite', 'pyropite', 'aabam'] },
+    { id: 'intOre', items: ['bo', 'galbinum', 'pyroxene', 'redbleckblende', 'bleck', 'cinnabar', 'maalite', 'pyropite', 'kyanite', 'aabam'] },
     { id: 'advOre', items: ['lupium', 'almine', 'acronite', 'sanguinite', 'gemmetal', 'skadite', 'chalkglance', 'waterstone'] },
-    { id: 'refined', items: ['pi', 'cuprum', 'gs', 'steel', 'bron', 'messing', 'messing_bor', 'tmessing', 'tungsteel', 'cronite', 'oghmium', 'gold', 'silver', 'electrum'] }
+    { id: 'refined', items: ['pi', 'cuprum', 'gs', 'steel', 'bron', 'messing', 'tmessing', 'tungsteel', 'cronite', 'oghmium', 'gold', 'silver', 'electrum'] }
 ];
 
 const EXTRACT_MAP = {
-    skadite: 'chalkglance', electrum: 'cp', gemmetal: 'waterstone', sanguinite: 'redbleckblende',
+    skadite: 'chalkglance', electrum: 'amarantum', gemmetal: 'waterstone', sanguinite: 'redbleckblende',
     almine: 'pyroxene', acronite: 'pyroxene', lupium: 'galbinum',
     pyroxene: 'galbinum', galbinum: 'tephra', redbleckblende: 'tephra',
-    bo: 'granum', maalite: 'magmum', pyropite: 'magmum', aabam: 'redbleckblende', calamine: 'amarantum', 
-    silver: 'redbleckblende', chalkglance: 'calspar', cuprum: 'malachite', pi: 'bo', coke: 'coal', pitch: 'coal', ichor: 'cinnabar',
-    bleck: 'amarantum', bleckblende: 'saburra', jadeite: 'saburra', malachite: 'saburra', sp: 'saburra',
+    bo: 'granum', maalite: 'magmum', pyropite: 'magmum', kyanite: 'magmum', aabam: 'redbleckblende', calamine: 'amarantum', 
+    silver: 'redbleckblende', chalkglance: 'calspar', cuprum: 'malachite', pi: 'bo', coke: 'coal', pitch: 'coal', ichor: 'cinnabar', sulfur: 'cinnabar',
+    bleck: 'bleckblende', bleckblende: 'saburra', jadeite: 'saburra', malachite: 'saburra', sp: 'saburra',
     granumpowder: 'granum', amarantum: 'granum', flakestone: 'granum', calspar: 'calx', coal: 'calx', 
     cp: 'calx', cinnabar: 'tephra', magmum: 'tephra', volcanicash: 'tephra', pyrite: 'saburra',
-    gaborepowder: 'gabore', lodestonepowder: 'lodestone', ritualash: 'risensacrificecarcass'
+    gaborepowder: 'gabore', lodestonepowder: 'lodestone', ritualash: 'risensacrificecarcass', gold: 'electrum'
 };
 
 const RECIPES = {
@@ -30,7 +30,6 @@ const RECIPES = {
     gs: { type: 'alloy', primary: 'pi', cat1: 'cp', cat2: 'coke' },
     tmessing: { type: 'alloy', primary: 'messing', cat1: 'almine', cat2: 'gemmetal' },
     messing: { type: 'alloy', primary: 'cuprum', cat1: 'calamine', cat2: 'sp' },
-    messing_bor: { type: 'alloy', primary: 'cuprum', cat1: 'bor', cat2: 'sp' },
     bron: { type: 'alloy', primary: 'cuprum', cat1: 'bleckblende', cat2: 'sp' }
 };
 
