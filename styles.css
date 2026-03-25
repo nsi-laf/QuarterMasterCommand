@@ -21,6 +21,7 @@
 
 body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-main); color: var(--text); margin: 0; padding: 15px; font-size: 14px; transition: background 0.3s, color 0.3s; overflow-x: hidden; }
 
+/* Fully responsive header handling */
 .app-header { display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 25px; gap: 15px; text-align: center; }
 .header-titles { width: 100%; }
 .app-title { color: var(--accent); margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 2px; }

@@ -98,6 +98,7 @@ function navFocus(dir) {
 
 function updateFocusView() {
     if (pipelineViewMode !== 'focus') return;
+    const t = i18n[currentLang] || i18n['en'];
     const cards = document.querySelectorAll('#stepsOutput .step-card');
     cards.forEach((card, index) => {
         if (index === focusIndex) card.classList.add('active-focus');
@@ -105,7 +106,7 @@ function updateFocusView() {
     });
     const navText = document.getElementById('focusProgressText');
     if (navText && pipelineStepsRaw.length > 0) {
-        navText.innerText = `${i18n[currentLang].stepPrefix} ${focusIndex + 1} / ${pipelineStepsRaw.length}`;
+        navText.innerText = `${t.stepPrefix || 'Step'} ${focusIndex + 1} / ${pipelineStepsRaw.length}`;
     }
 }
 
@@ -120,10 +121,10 @@ function updatePipelineVisuals() {
     
     const progBar = document.getElementById('projectProgress');
     const progText = document.getElementById('projectProgressText');
-    const t = i18n[currentLang];
+    const t = i18n[currentLang] || i18n['en'];
     
     if(progBar) progBar.style.width = percent + '%';
-    if(progText) progText.innerText = `${percent}% ${t.pipeCompleted}`;
+    if(progText) progText.innerText = `${percent}% ${t.pipeCompleted || 'Production Progress'}`;
 }
 
 function toggleStep(index) {
@@ -170,7 +171,8 @@ function toggleStep(index) {
 }
 
 function restartPipeline() {
-    if (!confirm(i18n[currentLang].restartPrompt || "Restart the pipeline? This will un-check all steps and remove their yields from your inventory.")) return;
+    const t = i18n[currentLang] || i18n['en'];
+    if (!confirm(t.restartPrompt || "Restart the pipeline? This will un-check all steps and remove their yields from your inventory.")) return;
     clearPipelineProgress();
     updatePipelineVisuals();
     if(pipelineViewMode === 'focus') updateFocusView();

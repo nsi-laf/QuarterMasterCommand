@@ -75,14 +75,14 @@ function autoFillCart() {
 function renderMarketTable() {
     const container = document.getElementById('marketContainer');
     if (!container) return;
-    const t = i18n[currentLang];
-    const addLabel = document.getElementById('mode').value === 'stacks' ? t.qAddStk : t.qAdd;
-    const subLabel = document.getElementById('mode').value === 'stacks' ? t.qSubStk : t.qSub;
+    const t = i18n[currentLang] || i18n['en'];
+    const addLabel = document.getElementById('mode').value === 'stacks' ? (t.qAddStk || '+1 Stk') : (t.qAdd || '+10k');
+    const subLabel = document.getElementById('mode').value === 'stacks' ? (t.qSubStk || '-1 Stk') : (t.qSub || '-10k');
     
-    let html = `<div class="market-row market-header desktop-only"><div></div><div style="text-align:center">${t.tblPrice}</div><div style="text-align:center">${t.tblBuy}</div><div style="text-align:right">${t.tblCost}</div><div style="text-align:right">${t.tblStash}</div></div>`; 
+    let html = `<div class="market-row market-header desktop-only"><div></div><div style="text-align:center">${t.tblPrice || 'Price'}</div><div style="text-align:center">${t.tblBuy || 'Buy'}</div><div style="text-align:right">${t.tblCost || 'Cost'}</div><div style="text-align:right">${t.tblStash || 'Stash'}</div></div>`; 
 
     CATEGORIES.forEach(cat => {
-        html += `<div id="m_cat_${cat.id}" style="display:none;"><div class="bank-category" style="margin-top:10px; margin-bottom:5px;">${t.categories[cat.id] || cat.id}</div>`;
+        html += `<div id="m_cat_${cat.id}" style="display:none;"><div class="bank-category" style="margin-top:10px; margin-bottom:5px;">${(t.categories && t.categories[cat.id]) ? t.categories[cat.id] : cat.id}</div>`;
 
         cat.items.forEach(k => {
             if(!marketData[k]) return;
@@ -104,19 +104,19 @@ function renderMarketTable() {
                 </div>`;
             });
 
-            let itemName = t.items[k] || (k.charAt(0).toUpperCase() + k.slice(1));
+            let itemName = (t.items && t.items[k]) ? t.items[k] : (k.charAt(0).toUpperCase() + k.slice(1));
             html += `<div class="market-row" id="row_m_${k}" style="display:none; border-bottom: 1px dashed var(--border); padding-bottom: 10px;">
                 <div style="font-weight:bold; color:var(--accent); align-self: start; margin-top: 5px;">${itemName}</div>
                 <div style="text-align:center; align-self: start;">${priceHtml}</div>
                 <div style="text-align:center; align-self: start;">${buyHtml}</div>
-                <div style="text-align:right; align-self: start; margin-top: 5px;"><span class="mobile-label">${t.tblCost}</span><span style="font-weight:bold; color:var(--accent); font-size: 1.1em;" id="cost_${k}">0.00</span></div>
-                <div style="text-align:right; align-self: start; margin-top: 5px;"><span class="mobile-label">${t.tblStash}</span><span style="color:var(--text-dim);" id="stash_${k}">0</span></div>
+                <div style="text-align:right; align-self: start; margin-top: 5px;"><span class="mobile-label">${t.tblCost || 'Cost'}</span><span style="font-weight:bold; color:var(--accent); font-size: 1.1em;" id="cost_${k}">0.00</span></div>
+                <div style="text-align:right; align-self: start; margin-top: 5px;"><span class="mobile-label">${t.tblStash || 'Stash'}</span><span style="color:var(--text-dim);" id="stash_${k}">0</span></div>
             </div>`;
         });
         html += `</div>`;
     });
     
-    html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; padding-top:15px; border-top:1px solid var(--border);"><div style="font-weight:bold; text-transform:uppercase; color:var(--text-dim);">${t.cartTotal}</div><div id="cartTotalGold" style="font-weight:bold; color:var(--accent); font-size:1.3em;">0.00 g</div></div>`;
+    html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; padding-top:15px; border-top:1px solid var(--border);"><div style="font-weight:bold; text-transform:uppercase; color:var(--text-dim);">${t.cartTotal || 'Total'}</div><div id="cartTotalGold" style="font-weight:bold; color:var(--accent); font-size:1.3em;">0.00 g</div></div>`;
     container.innerHTML = html;
     
     if(document.getElementById('targetMetal')) {
@@ -127,17 +127,17 @@ function renderMarketTable() {
 function renderBankTable() {
     const table = document.getElementById('bankTable');
     if(!table) return;
-    const t = i18n[currentLang];
-    const addLabel = document.getElementById('mode').value === 'stacks' ? t.qAddStk : t.qAdd;
-    const subLabel = document.getElementById('mode').value === 'stacks' ? t.qSubStk : t.qSub;
+    const t = i18n[currentLang] || i18n['en'];
+    const addLabel = document.getElementById('mode').value === 'stacks' ? (t.qAddStk || '+1 Stk') : (t.qAdd || '+10k');
+    const subLabel = document.getElementById('mode').value === 'stacks' ? (t.qSubStk || '-1 Stk') : (t.qSub || '-10k');
     
     let html = ""; 
     CATEGORIES.forEach(cat => {
         html += `<tbody id="cat_${cat.id}">`;
-        html += `<tr><td colspan="2" class="bank-category">${t.categories[cat.id] || cat.id}</td></tr>`;
+        html += `<tr><td colspan="2" class="bank-category">${(t.categories && t.categories[cat.id]) ? t.categories[cat.id] : cat.id}</td></tr>`;
         cat.items.forEach(k => {
             const val = Number(document.getElementById('b_'+k)?.value) || 0;
-            let itemName = t.items[k] || (k.charAt(0).toUpperCase() + k.slice(1));
+            let itemName = (t.items && t.items[k]) ? t.items[k] : (k.charAt(0).toUpperCase() + k.slice(1));
             
             html += `<tr id="row_b_${k}">
                 <td style="width:35%; font-weight:bold; padding-left:10px;">${itemName}</td>

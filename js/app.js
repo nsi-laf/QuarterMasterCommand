@@ -40,14 +40,14 @@ function run() { clearTimeout(timer); timer = setTimeout(calculate, 150); }
 
 function calculate() {
     const mode = document.getElementById('mode').value;
-    const t = i18n[currentLang];
+    const t = i18n[currentLang] || i18n['en'];
     const targetRaw = Number(document.getElementById('targetAmount').value) || 0;
     const crafters = Math.max(1, Number(document.getElementById('crafters').value));
     const targetMetal = document.getElementById('targetMetal').value;
     const mult = mode === 'stacks' ? 10000 : 1;
     
     if (targetRaw <= 0) {
-        document.getElementById('gatherOutput').innerHTML = `<div class="empty-msg">${t.noTarget}</div>`;
+        document.getElementById('gatherOutput').innerHTML = `<div class="empty-msg">${t.noTarget || 'No target set.'}</div>`;
         document.getElementById('stepsOutput').innerHTML = "";
         document.getElementById('statStacks').innerText = "0.00";
         if(document.getElementById('cartTotalGold')) document.getElementById('cartTotalGold').innerText = "0.00 g";
@@ -127,12 +127,12 @@ function calculate() {
             let amountAcquired = totalNeeded - finalDeficits[k];
             let progressPct = totalNeeded > 0 ? Math.min(100, Math.max(0, (amountAcquired / totalNeeded) * 100)) : 0;
 
-            let itemName = t.items[k] || (k.charAt(0).toUpperCase() + k.slice(1));
+            let itemName = (t.items && t.items[k]) ? t.items[k] : (k.charAt(0).toUpperCase() + k.slice(1));
             gHTML += `<div class="logistics-item ${finalDeficits[k] < 10000 ? 'hm-low' : 'hm-high'}" style="--prog: ${progressPct}%;"><span>${itemName}</span><span>${fmtVal}</span></div>`;
         }
     });
 
-    document.getElementById('gatherOutput').innerHTML = totalGatherUnits > 0 ? gHTML : `<div class="empty-msg">${t.allCovered}</div>`;
+    document.getElementById('gatherOutput').innerHTML = totalGatherUnits > 0 ? gHTML : `<div class="empty-msg">${t.allCovered || 'All covered!'}</div>`;
     document.getElementById('statStacks').innerText = (totalGatherUnits / 10000).toFixed(2);
 
     let newPipeline = [...actualExtractions.extSteps, ...actualTree.steps];
@@ -143,7 +143,7 @@ function calculate() {
     }
     pipelineStepsRaw = newPipeline;
 
-    const perCr = crafters > 1 ? ` <span style="color:var(--warning); font-size:0.8em;">${t.perCrafter}</span>` : "";
+    const perCr = crafters > 1 ? ` <span style="color:var(--warning); font-size:0.8em;">${t.perCrafter || '(Per Crafter)'}</span>` : "";
 
     let outputHTML = pipelineStepsRaw.map((stepObj, index) => {
         let isCompleted = completedSteps.includes(index) ? 'completed' : '';
@@ -154,12 +154,12 @@ function calculate() {
         });
 
         let mainYieldsStr = (stepObj.mainYields && stepObj.mainYields.length > 0) ? stepObj.mainYields.map(y => {
-            let yName = t.items[y.item] || (y.item.charAt(0).toUpperCase() + y.item.slice(1));
+            let yName = (t.items && t.items[y.item]) ? t.items[y.item] : (y.item.charAt(0).toUpperCase() + y.item.slice(1));
             return `<span class="highlight">${y.amount.toLocaleString()} ${yName}</span>`;
         }).join(', ') : "";
         
         let bpYieldsStr = (stepObj.byproducts && stepObj.byproducts.length > 0) ? stepObj.byproducts.map(y => {
-            let yName = t.items[y.item] || (y.item.charAt(0).toUpperCase() + y.item.slice(1));
+            let yName = (t.items && t.items[y.item]) ? t.items[y.item] : (y.item.charAt(0).toUpperCase() + y.item.slice(1));
             return `${y.amount.toLocaleString()} ${yName}`;
         }).join(', ') : "None";
 
@@ -179,11 +179,11 @@ function calculate() {
         }
 
         return `<div class="step-card ${isCompleted}" id="step_${index}" onclick="toggleStep(${index})">
-            <div><span style="color:var(--text-dim); font-weight:bold; margin-right:5px;">${t.stepPrefix} ${index + 1}.</span>${modAction}${perCr}</div>
+            <div><span style="color:var(--text-dim); font-weight:bold; margin-right:5px;">${t.stepPrefix || 'Step'} ${index + 1}.</span>${modAction}${perCr}</div>
             
             <div style="margin-top: 6px; font-size: 11px;">
-                <span style="color:var(--success); font-weight:bold;">${t.stepYieldsMain}</span> ${mainYieldsStr}<br>
-                <span style="color:var(--text-dim); font-weight:bold;">${t.stepByproducts}</span> <span style="color:var(--text-dim);">${bpYieldsStr}</span>
+                <span style="color:var(--success); font-weight:bold;">${t.stepYieldsMain || 'Yields:'}</span> ${mainYieldsStr}<br>
+                <span style="color:var(--text-dim); font-weight:bold;">${t.stepByproducts || 'Byproducts:'}</span> <span style="color:var(--text-dim);">${bpYieldsStr}</span>
             </div>
 
             ${routeHtml}
@@ -193,7 +193,7 @@ function calculate() {
     let byproductsString = "";
     Object.keys(byproductsRaw).forEach(k => {
         if (byproductsRaw[k] > 0) {
-            let itemName = t.items[k] || (k.charAt(0).toUpperCase() + k.slice(1));
+            let itemName = (t.items && t.items[k]) ? t.items[k] : (k.charAt(0).toUpperCase() + k.slice(1));
             byproductsString += `<div style="display:flex; justify-content:space-between; margin-bottom: 2px; font-size: 13px;">
                 <span>${itemName}</span>
                 <span style="color: var(--accent); font-weight: bold;">${byproductsRaw[k].toLocaleString()}</span>
@@ -220,12 +220,12 @@ function calculate() {
 }
 
 function exportToCSV() {
-    const t = i18n[currentLang];
+    const t = i18n[currentLang] || i18n['en'];
     const mode = document.getElementById('mode').value;
     const targetMetal = document.getElementById('targetMetal').value;
     const targetVal = document.getElementById('targetAmount').value;
     
-    let csv = `Quartermaster Command Logistics Order\nTarget:,${t.items[targetMetal]},Amount:,${targetVal} ${mode === 'stacks' ? 'Stacks' : 'Units'}\n\n`;
+    let csv = `Quartermaster Command Logistics Order\nTarget:,${t.items[targetMetal] || targetMetal},Amount:,${targetVal} ${mode === 'stacks' ? 'Stacks' : 'Units'}\n\n`;
     csv += "Item,Inventory Stock,Market Cart Buy,Deficit to Gather\n";
     
     const relevant = getRelevantItems(targetMetal);
@@ -238,7 +238,7 @@ function exportToCSV() {
             let d = pureDeficits[k] || 0;
 
             if(b > 0 || cQty > 0 || d > 0) {
-                let itemName = t.items[k] || k;
+                let itemName = (t.items && t.items[k]) ? t.items[k] : k;
                 let fmtB = mode === 'stacks' ? b : b;
                 let fmtC = mode === 'stacks' ? cQty : cQty;
                 let fmtD = mode === 'stacks' ? (d/10000).toFixed(2) : d;

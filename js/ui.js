@@ -84,7 +84,7 @@ function setLang(code) {
 
 function changeLang() {
     currentLang = document.getElementById('lang').value;
-    const t = i18n[currentLang];
+    const t = i18n[currentLang] || i18n['en'];
     
     document.getElementById('flag_en').classList.toggle('active', currentLang === 'en');
     document.getElementById('flag_fr').classList.toggle('active', currentLang === 'fr');

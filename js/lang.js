@@ -32,6 +32,7 @@ const i18n = {
         
         verbCrush: "Crush", verbGrind: "Grind", verbExtract: "Extract", verbSmelt: "Smelt", verbBake: "Bake", verbAlloy: "Alloy", verbProcess: "Process",
         inMachine: "in the", stepWith: "with", stepAnd: "and", perCrafter: "(Per Crafter)", stepPrefix: "Step",
+        stepYieldsMain: "Yields:", stepByproducts: "Byproducts:",
         
         pipeCompleted: "Production Progress",
         btnPipeReset: "Reset",
@@ -91,9 +92,10 @@ const i18n = {
         
         verbCrush: "Concassez", verbGrind: "Broyez", verbExtract: "Extrayez", verbSmelt: "Fondez", verbBake: "Cuisez", verbAlloy: "Alliez", verbProcess: "Traitez",
         inMachine: "dans le", stepWith: "avec", stepAnd: "et", perCrafter: "(Par Artisan)", stepPrefix: "Étape",
+        stepYieldsMain: "Produits :", stepByproducts: "Sous-produits :",
 
-        pipeCompleted: "Progression de la Production",
         btnPipeReset: "Réinitialiser",
+        pipeCompleted: "Progression de la Production",
 
         tooltipBestYield: "Plus Efficace (Coût Total le Plus Bas)", tooltipMaxYield: "Maximum de Sous-produits Générés", tooltipRegionLocked: "Machine Limitée par Région",
 

@@ -1,17 +1,20 @@
 function buildDiscordMessage() {
-    const t = i18n[currentLang];
+    const t = i18n[currentLang] || i18n['en'];
     const mode = document.getElementById('mode').value;
     const targetVal = document.getElementById('targetAmount').value;
     const targetMetal = document.getElementById('targetMetal').value;
     const relevant = getRelevantItems(targetMetal);
-    let msg = `**${t.discHeader}: ${t.items[targetMetal].toUpperCase()}**\n*Targeting ${targetVal} ${mode === 'stacks' ? 'Stacks' : 'Units'} of ${t.items[targetMetal]}*\n\n`;
+    
+    const targetName = (t.items && t.items[targetMetal]) ? t.items[targetMetal] : targetMetal;
+    let msg = `**${t.discHeader || 'LOGISTICS ORDER'}: ${targetName.toUpperCase()}**\n*Targeting ${targetVal} ${mode === 'stacks' ? 'Stacks' : 'Units'} of ${targetName}*\n\n`;
     
     let bankString = "";
     Object.values(CATEGORIES).flatMap(c => c.items).forEach(k => {
         let bankRaw = Number(document.getElementById('b_'+k)?.value) || 0;
         if (bankRaw > 0 && relevant.has(k)) {
             let fmtAmt = mode === 'stacks' ? bankRaw.toFixed(2) + " Stacks" : bankRaw.toLocaleString();
-            bankString += `- ${t.items[k]||k}: ${fmtAmt}\n`;
+            let itemName = (t.items && t.items[k]) ? t.items[k] : k;
+            bankString += `- ${itemName}: ${fmtAmt}\n`;
         }
     });
     if (bankString !== "") msg += `**CURRENT BANK STOCK:**\n\`\`\`\n${bankString}\`\`\`\n`;
@@ -27,29 +30,32 @@ function buildDiscordMessage() {
         }
         if (totalQty > 0 && relevant.has(k)) {
             let fmtAmt = mode === 'stacks' ? totalQty.toFixed(2) + " Stacks" : totalQty.toLocaleString();
-            marketString += `- ${t.items[k]||k}: ${fmtAmt}\n`;
+            let itemName = (t.items && t.items[k]) ? t.items[k] : k;
+            marketString += `- ${itemName}: ${fmtAmt}\n`;
             hasMarket = true;
         }
     });
     
     if (hasMarket) {
-        msg += `**${t.discMarket}**\n\`\`\`\n${marketString}\`\`\`\n*Total Estimated Gold Cost: ${totalGold.toFixed(2)} g*\n\n`;
+        msg += `**${t.discMarket || 'MARKET PURCHASES:'}**\n\`\`\`\n${marketString}\`\`\`\n*Total Estimated Gold Cost: ${totalGold.toFixed(2)} g*\n\n`;
     }
 
     let gatherString = ""; let hasGather = false;
     Object.keys(pureDeficits).forEach(k => {
         if (pureDeficits[k] > 0) {
             let fmtAmt = mode === 'stacks' ? (pureDeficits[k]/10000).toFixed(2) + " Stacks" : pureDeficits[k].toLocaleString();
-            gatherString += `- ${t.items[k]||k}: ${fmtAmt}\n`;
+            let itemName = (t.items && t.items[k]) ? t.items[k] : k;
+            gatherString += `- ${itemName}: ${fmtAmt}\n`;
             hasGather = true;
         }
     });
 
-    if (hasGather) msg += `**${t.discReq}**\n\`\`\`diff\n- ${gatherString.replace(/\n/g, '\n- ')}\`\`\`\n`;
-    else msg += `**${t.discReq}**\n\`\`\`yaml\n${t.discStock}\`\`\`\n`;
+    const reqLabel = t.discReq || "MANUAL GATHER REQUIRED:";
+    if (hasGather) msg += `**${reqLabel}**\n\`\`\`diff\n- ${gatherString.replace(/\n/g, '\n- ')}\`\`\`\n`;
+    else msg += `**${reqLabel}**\n\`\`\`yaml\n${t.discStock || 'All gathering covered.'}\`\`\`\n`;
 
     if (pipelineStepsRaw.length > 0) {
-        msg += `**${t.mfgPipe.toUpperCase()}**\n\`\`\`md\n`;
+        msg += `**MANUFACTURING PIPELINE**\n\`\`\`md\n`;
         pipelineStepsRaw.forEach((stepObj, index) => {
             let checkmark = completedSteps.includes(index) ? '[x] ' : '[ ] ';
             let textAction = stepObj.htmlAction.replace(/<[^>]*>?/gm, '');
@@ -59,11 +65,13 @@ function buildDiscordMessage() {
     }
     
     let hasByproducts = false;
-    let bpString = `**${t.byproductsTitle}**\n\`\`\`\n`;
+    const bpLabel = t.byproductsTitle || "TOTAL RECOVERED BYPRODUCTS";
+    let bpString = `**${bpLabel}**\n\`\`\`\n`;
     Object.keys(byproductsRaw).forEach(k => {
         if (byproductsRaw[k] > 0) {
             let fmtAmt = mode === 'stacks' ? (byproductsRaw[k]/10000).toFixed(2) + " Stacks" : byproductsRaw[k].toLocaleString();
-            bpString += `- ${t.items[k]||k}: ${fmtAmt}\n`;
+            let itemName = (t.items && t.items[k]) ? t.items[k] : k;
+            bpString += `- ${itemName}: ${fmtAmt}\n`;
             hasByproducts = true;
         }
     });
@@ -71,12 +79,20 @@ function buildDiscordMessage() {
     return msg;
 }
 
-function copyDiscord() { navigator.clipboard.writeText(buildDiscordMessage()); alert(i18n[currentLang].discCopied); }
+function copyDiscord() { 
+    const t = i18n[currentLang] || i18n['en'];
+    navigator.clipboard.writeText(buildDiscordMessage()); 
+    alert(t.discCopied || "Copied to clipboard!"); 
+}
 
 async function sendToDiscord() {
-    const t = i18n[currentLang];
+    const t = i18n[currentLang] || i18n['en'];
     const webhookUrl = document.getElementById('webhookUrl').value;
-    if (!webhookUrl || !webhookUrl.startsWith('https://discord.com/api/webhooks/')) { alert(t.errWebhook); openModal('settingsModal'); return; }
+    if (!webhookUrl || !webhookUrl.startsWith('https://discord.com/api/webhooks/')) { 
+        alert(t.errWebhook || "Invalid Webhook URL"); 
+        openModal('settingsModal'); 
+        return; 
+    }
 
     const msg = buildDiscordMessage();
 
@@ -87,9 +103,9 @@ async function sendToDiscord() {
             body: JSON.stringify({ content: msg })
         });
 
-        if (response.ok) alert(t.sucSend);
-        else alert(t.errSend + ` Status: ${response.status}`);
+        if (response.ok) alert(t.sucSend || "Order dispatched to Discord!");
+        else alert((t.errSend || "Failed to send.") + ` Status: ${response.status}`);
     } catch (e) {
-        alert(t.errSend + " " + e.message);
+        alert((t.errSend || "Failed to send.") + " " + e.message);
     }
 }

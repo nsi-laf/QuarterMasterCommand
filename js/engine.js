@@ -43,10 +43,9 @@ function getRelevantItems(targetMetal) {
 function resolveTree(targetMetal, amount, bankData, mR) {
     let deficits = {};
     let steps = [];
-    const t = i18n[currentLang];
+    const t = i18n[currentLang] || i18n['en'];
     const bankCopy = { ...bankData };
 
-    // Fallbacks to guarantee translations never render as undefined
     const vAlloy = t.verbAlloy || "Alloy";
     const vSmelt = t.verbSmelt || "Smelt";
     const vAnd = t.stepAnd || "and";
@@ -94,7 +93,11 @@ function resolveTree(targetMetal, amount, bankData, mR) {
             const cat1Needed = Math.ceil(primaryNeeded * 0.5);
             const cat2Needed = Math.ceil(primaryNeeded * 0.5);
             
-            let htmlStr = `<strong>${vAlloy} <span class="highlight">${primaryNeeded.toLocaleString()} ${t.items[recObj.primary]||recObj.primary}</span>, <span class="highlight">${cat1Needed.toLocaleString()} ${t.items[recObj.cat1]||recObj.cat1}</span> ${vAnd} <span class="highlight">${cat2Needed.toLocaleString()} ${t.items[recObj.cat2]||recObj.cat2}</span></strong>`;
+            let itemNamePrimary = (t.items && t.items[recObj.primary]) ? t.items[recObj.primary] : recObj.primary;
+            let itemNameCat1 = (t.items && t.items[recObj.cat1]) ? t.items[recObj.cat1] : recObj.cat1;
+            let itemNameCat2 = (t.items && t.items[recObj.cat2]) ? t.items[recObj.cat2] : recObj.cat2;
+            
+            let htmlStr = `<strong>${vAlloy} <span class="highlight">${primaryNeeded.toLocaleString()} ${itemNamePrimary}</span>, <span class="highlight">${cat1Needed.toLocaleString()} ${itemNameCat1}</span> ${vAnd} <span class="highlight">${cat2Needed.toLocaleString()} ${itemNameCat2}</span></strong>`;
             
             steps.unshift({
                 htmlAction: htmlStr,
@@ -112,7 +115,10 @@ function resolveTree(targetMetal, amount, bankData, mR) {
             const oreNeeded = Math.ceil(missing / (recObj.oreYield * mR));
             const catNeeded = Math.ceil(oreNeeded * recObj.catReq);
             
-            let htmlStr = `<strong>${vSmelt} <span class="highlight">${oreNeeded.toLocaleString()} ${t.items[recObj.ore]||recObj.ore}</span> ${vInMachine} Furnace ${vWith} <span class="highlight">${catNeeded.toLocaleString()} ${t.items[recObj.cat]||recObj.cat}</span></strong>`;
+            let itemNameOre = (t.items && t.items[recObj.ore]) ? t.items[recObj.ore] : recObj.ore;
+            let itemNameCat = (t.items && t.items[recObj.cat]) ? t.items[recObj.cat] : recObj.cat;
+            
+            let htmlStr = `<strong>${vSmelt} <span class="highlight">${oreNeeded.toLocaleString()} ${itemNameOre}</span> ${vInMachine} Furnace ${vWith} <span class="highlight">${catNeeded.toLocaleString()} ${itemNameCat}</span></strong>`;
             
             steps.unshift({
                 htmlAction: htmlStr,
@@ -260,7 +266,7 @@ function resolveExtractions(deficits, mE, mM, bankData) {
                         }
                     });
 
-                    const t = i18n[currentLang];
+                    const t = i18n[currentLang] || i18n['en'];
                     
                     let verbKey = 'verbProcess';
                     if (route.action === 'stepCrush') verbKey = 'verbCrush';
@@ -274,10 +280,12 @@ function resolveExtractions(deficits, mE, mM, bankData) {
                     let vWith = t.stepWith || "with";
 
                     let machine = routeName.split(' (')[0];
+                    let itemNameSource = (t.items && t.items[source]) ? t.items[source] : source;
 
-                    let htmlAction = `<strong>${verb} <span class="highlight">${maxSourceReq.toLocaleString()} ${t.items[source]||source}</span> ${vInMachine} ${machine}`;
+                    let htmlAction = `<strong>${verb} <span class="highlight">${maxSourceReq.toLocaleString()} ${itemNameSource}</span> ${vInMachine} ${machine}`;
                     if (catQty > 0 && route.cat) {
-                        htmlAction += ` ${vWith} <span class="highlight">${catQty.toLocaleString()} ${t.items[route.cat]||route.cat}</span>`;
+                        let itemNameCat = (t.items && t.items[route.cat]) ? t.items[route.cat] : route.cat;
+                        htmlAction += ` ${vWith} <span class="highlight">${catQty.toLocaleString()} ${itemNameCat}</span>`;
                     }
                     htmlAction += `</strong>`;
 
