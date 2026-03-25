@@ -1,73 +1,84 @@
-# ⚔️ Quartermaster Command v5.4
-> **The ultimate Mortal Online 2 manufacturing calculator and logistics dashboard.** > *Designed and developed by Jaegh.*
+# ⚔️ Quartermaster Command
 
-**Quartermaster Command** is a client-side web application designed for MO2 Guild Leaders, Quartermasters, and Logistics Officers. It instantly calculates exact raw material requirements, multi-stage manufacturing pipelines, and market costs needed to produce any advanced metal (like Steel, Tungsteel, or Oghmium), factoring in your existing bank stock, character skills, and extraction strategies.
+![Version](https://img.shields.io/badge/version-v8.0-blue.svg)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-323330?style=flat&logo=javascript&logoColor=F7DF1E)
+![PWA](https://img.shields.io/badge/PWA-Ready-success)
 
----
+**Quartermaster Command** (formerly *Jaegh's Refining Suite*) is the ultimate manufacturing calculator and logistics dashboard for **Mortal Online 2**. Designed for guild quartermasters, gatherers, and master crafters, this suite handles complex extraction math, market budgeting, and work-order dispatching in a sleek, offline-capable interface.
 
-## 🌟 Feature Overview
-
-| Feature | Description |
-| :--- | :--- |
-| 🧠 **Pipeline Intelligence** | Automatically maps out multi-step extraction, refining, and smelting tasks. Skips steps if you already have intermediate materials (like Pig Iron or Calx Powder) in your bank. |
-| ⚡ **Calculate Craftable** | A powerful solver that scans your current bank inventory and calculates the absolute maximum amount of your target metal you can produce with what you have on hand. |
-| 🛒 **Smart Market Cart** | Enter market prices and buy quantities. Use per-item `Fill` / `Clear` buttons, or click `🛒 Auto-Fill All` to instantly calculate how much you need to buy and the **Total Gold Cost**. |
-| 🤝 **Share / Import Setups** | Generate a Base64 code of your current bank, market cart, and target to instantly share with guildmates or transfer between devices. |
-| 📋 **Discord Dispatch** | Generates a beautifully formatted Markdown work order—separating Market Purchases (with gold totals) from Manual Gathering tasks—ready to paste directly into your guild's Discord. |
-| 📦 **Category-Sorted Bank** | Your inventory is cleanly sorted by categories (Raw Materials, Catalysts, Ores, Refined Metals) for rapid data entry. The metal you are actively trying to craft is intelligently hidden to prevent circular logic. |
-| 💾 **Persistent Data** | Remembers your inventory, market prices, and UI settings automatically using LocalStorage. No database or login required. |
-| 🌍 **Massive Localization** | Fully localized and instantly toggleable between **15 languages**: Arabic, Czech, Deutsch, English, Español, Français, Italia, Magyar, Polski, Português, Română, Russian, Suomi, Svenska, and Türkçe. |
+*"Steel wins battles, silver wins wars."* — [MTM] Jaegh
 
 ---
 
-## 📖 How to Use
+## ✨ Feature Overview
 
-**1. Set Your Objective**
-* Select your **Target Metal** (e.g., Steel, Tungsteel).
-* Enter your desired **Amount**. Toggle between `Units` or `Stacks (10k)` in the settings for easier reading.
-* Set your **Crafters** count to automatically divide the workload steps across your team.
-
-**2. Check Your Bank (or Import One)**
-* Input your current inventory into the **Inventory Bank** section.
-* *Tip: Go to **⚙️ Settings > 💾 Data** to Paste a Share Code from a guildmate and instantly load their setup.*
-* *Tip: Don't know what to make? Enter your materials and click **⚡ Calculate Craftable From Inventory** to see your limits.*
-
-**3. Go Shopping & Calculate Gold**
-* Check the **Market Cart** module. Set your local server prices.
-* Click **🛒 Auto-Fill All** to automatically buy your entire missing deficit.
-* Check the bottom of the cart to see your **Total Gold Cost** before sending a buyer to the broker.
-
-**4. Dispatch the Order**
-* Review the **Deficit to Gather** panel for what needs to be manually mined.
-* Review the **Manufacturing Pipeline** for your exact step-by-step processing instructions. 
-* Click **⚙️ Settings > 📤 Integrations > 📋 Copy to Clipboard** and paste the resulting text directly into your guild's logistics channel, or use a Webhook to send it instantly.
+* 🧠 **Pipeline Intelligence:** Automatically maps out multi-step extraction, refining, and smelting tasks. The dynamic engine calculates whether to Crush, Grind, or Bake based on your global preferences (⭐ Most Efficient vs. 💎 Max Byproducts).
+* ⚡ **Calculate Craftable:** Scans your current bank inventory to calculate the absolute maximum amount of target metal you can produce with your existing stockpile.
+* 🛒 **Smart Market Cart:** Enter local market prices and buy quantities. Use *Auto-Fill All* to calculate exactly how much you need to buy to cover a deficit, tracking your **Total Gold Cost** in real-time.
+* 💾 **Share & Import (Base64):** Generate a secure code of your current setup (Bank, Cart, Pipeline) to instantly share with guildmates or transfer between devices.
+* 🚀 **Discord Dispatch:** Generates a beautifully formatted Markdown work order—separating Market Purchases from Manual Gathering—ready to be beamed directly to your guild's Discord server via Webhook.
+* 📱 **PWA Ready:** Installable as a Progressive Web App on Desktop or Mobile. Fully cached for offline use.
 
 ---
 
-## 💬 Example Discord Output
+## 🛠️ Architecture & Tech Stack
 
-When you click the Dispatch button, it generates a clean, readable order for your guildmates:
+This project is built using **100% Vanilla Web Technologies** (HTML, CSS, JS). No external frameworks or dependencies are required, making it incredibly fast and easy to host anywhere.
 
-```text
-**⚔️ LOGISTICS ORDER: STEEL ⚔️**
-*Targeting 10.00 Stacks of Steel*
+### Modular Codebase
+The core logic has been split into dedicated, maintainable modules:
+* `data.js`: Houses the `EXTRACTION_ROUTES` and `RECIPES` dictionaries. Contains all the raw MO2 math, yields, and catalyst requirements.
+* `engine.js`: The algorithmic brain. Topologically sorts required materials and dynamically builds the step-by-step pipeline.
+* `pipeline.js`: Handles interactive step toggling, global routing overrides, and progress bar visualization.
+* `market_bank.js`: Manages the interactive grid, math, and UI for the Inventory Bank and Market Cart.
+* `discord.js`: Parses current state into Markdown and pushes payloads via the Discord Webhook API.
+* `state.js`: Handles all `localStorage` saving, loading, and Base64 import/export logic.
+* `theme.js` & `ui.js`: Controls custom hex-color theming, Light/Dark mode, modal popups, and module visibility.
+* `lang.js`: Complete i18n support (currently English and French).
 
-**CURRENT BANK STOCK:**
-- Granum: 5.00 Stacks
-- Calx: 2.00 Stacks
+---
 
-**MARKET PURCHASES:**
-- Coal: 1.50 Stacks
-Total Budget: 25.00 g
+## 🚀 Installation & Usage
 
-**MANUAL GATHER REQUIRED:**
-- Granum: 11.52 Stacks
-- Saburra: 5.23 Stacks
+Because this is a static, client-side application, deployment is instant.
 
-Total: 16.75 Stacks to Gather
+### Local Usage
+1. Clone or download this repository.
+2. Open `index.html` in any modern web browser.
 
-**MANUFACTURING PIPELINE:**
-1. [ ] Extract 2.00 Stacks Calx yields 1.44 Stacks Calx Powder
-2. [ ] Extract 16.52 Stacks Granum yields 5.51 Stacks Blood Ore
-3. [ ] Smelt 5.51 Stacks Blood Ore and 1.50 Stacks Coal yields 2.21 Stacks Pig Iron
-...
+### Hosting (GitHub Pages / Netlify / Vercel)
+1. Push the repository to your preferred Git host.
+2. Enable static hosting pointing to the root directory.
+3. The included `sw.js` (Service Worker) and `manifest.json` will automatically allow users to install the app directly to their devices.
+
+---
+
+## 📖 Quick Start Guide
+
+1. **Set Your Objective:** Select your *Target Metal* (e.g., Steel) and desired *Amount*. Set your *Crafters* count to automatically divide the workload.
+2. **Check Your Bank:** Input your current inventory into the *Inventory Bank*. 
+   > *Tip: If you don't know what to make, enter your materials and click **⚡ Calculate Craftable From Inventory** to see your limits.*
+3. **Go Shopping:** Check the *Market Cart* module. Set local prices, then click **🛒 Auto-Fill All** to calculate your missing deficit and required gold budget.
+4. **Dispatch the Order:** Review the *Deficit to Gather* and *Manufacturing Pipeline*. Go to **Settings > Integrations** and push the order to your Discord logistics channel.
+
+---
+
+## 🎨 Customization
+
+Navigate to the **Settings** menu to fully personalize your Quartermaster Command:
+* Toggle between Light Mode and Dark Mode.
+* Set custom hex values for the Primary Accent, Background, and Text colors.
+* Hide or show specific modules to streamline your dashboard.
+* Switch between **Units** or **Stacks (10k)** display formats.
+
+---
+
+## 📜 License & Credits
+
+* **Author:** Created by [MTM] Jaegh for the MERCANTORM guild.
+* **Game:** Mortal Online 2 by Star Vault AB. (This tool is a fan-made project and is not affiliated with Star Vault).
+
+---
+*Happy Refining.*
