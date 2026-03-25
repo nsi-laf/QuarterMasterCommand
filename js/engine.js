@@ -2,9 +2,12 @@ function getPrimaryChain(targetMetal) {
     let chain = [targetMetal];
     let current = targetMetal;
     while (current) {
-        let rec = RECIPES[current];
-        if (rec) {
+        let recOpts = RECIPES[current];
+        if (recOpts) {
+            let firstKey = Object.keys(recOpts)[0];
+            let rec = recOpts[firstKey]; 
             if (rec.type === 'alloy') current = rec.primary;
+            else if (rec.type === 'smelt') current = rec.ore;
             else current = null;
         } else if (EXTRACT_MAP[current]) {
             current = EXTRACT_MAP[current]; 
@@ -22,11 +25,18 @@ function getRelevantItems(targetMetal) {
     
     while(queue.length > 0) {
         let item = queue.shift();
-        let rec = RECIPES[item];
         
-        if (rec) {
-            let deps = [rec.primary, rec.cat1, rec.cat2];
-            deps.forEach(d => { if (d && !relevant.has(d)) { relevant.add(d); queue.push(d); } });
+        let recOpts = RECIPES[item];
+        if (recOpts) {
+            Object.values(recOpts).forEach(rec => {
+                if (rec.type === 'alloy') {
+                    let deps = [rec.primary, rec.cat1, rec.cat2];
+                    deps.forEach(d => { if (d && !relevant.has(d)) { relevant.add(d); queue.push(d); } });
+                } else if (rec.type === 'smelt') {
+                    let deps = [rec.ore, rec.cat];
+                    deps.forEach(d => { if (d && !relevant.has(d)) { relevant.add(d); queue.push(d); } });
+                }
+            });
         }
         
         if (EXTRACT_MAP[item]) {
@@ -41,9 +51,9 @@ function makeExtStr(actionKey, qty, item, yields, catQty = 0, catItem = null) {
     const t = i18n[currentLang];
     let action = t[actionKey] || actionKey;
     
-    let resStr = `<span class="highlight">${qty.toLocaleString()} ${t.items[item]||item}</span>`;
+    let resStr = `<span class="highlight">${qty.toLocaleString()} ${t.items[item]|| (item.charAt(0).toUpperCase() + item.slice(1))}</span>`;
     if (catQty > 0 && catItem) {
-        resStr += ` ${t.stepWith} <span class="highlight">${catQty.toLocaleString()} ${t.items[catItem]||catItem}</span>`;
+        resStr += ` ${t.stepWith} <span class="highlight">${catQty.toLocaleString()} ${t.items[catItem]|| (catItem.charAt(0).toUpperCase() + catItem.slice(1))}</span>`;
     }
     
     return `${action} ${resStr}`;
@@ -68,28 +78,69 @@ function resolveTree(targetMetal, amount, bankData, mR) {
 
         if (missing <= 0) return;
 
-        let recipe = RECIPES[item];
-        if (!recipe) {
+        let recipesObj = RECIPES[item];
+        if (!recipesObj) {
             deficits[item] = (deficits[item] || 0) + missing;
             return;
         }
         
+        let availableRoutes = Object.keys(recipesObj);
+        let stepKey = `recipe_${item}`;
+        let routeName = userPathChoices[stepKey];
+        
+        if (item === document.getElementById('targetMetal').value) {
+            let dropdownVal = document.getElementById('targetRecipe').value;
+            if (dropdownVal && recipesObj[dropdownVal]) {
+                routeName = dropdownVal;
+                userPathChoices[stepKey] = routeName;
+            }
+        }
+
+        if (!routeName || !recipesObj[routeName]) routeName = availableRoutes[0];
+        
+        let recipe = recipesObj[routeName];
+        
+        let routeStats = availableRoutes.map(rName => {
+            return { name: rName, isBestYield: false, isMaxYield: false, isRegionLocked: false };
+        });
+
         if (recipe.type === 'alloy') {
             const primaryNeeded = Math.ceil(missing / (0.7 * mR));
             const cat1Needed = Math.ceil(primaryNeeded * 0.5);
             const cat2Needed = Math.ceil(primaryNeeded * 0.5);
             
-            let htmlStr = `<strong>${t.stepAlloy || 'Alloy'} <span class="highlight">${primaryNeeded.toLocaleString()} ${t.items[recipe.primary]||recipe.primary}</span> ${t.stepAnd} <span class="highlight">${cat1Needed.toLocaleString()} ${t.items[recipe.cat1]||recipe.cat1}</span> ${t.stepAnd} <span class="highlight">${cat2Needed.toLocaleString()} ${t.items[recipe.cat2]||recipe.cat2}</span></strong>`;
+            let htmlStr = `<strong>${t.stepAlloy || 'Alloy'} <span class="highlight">${primaryNeeded.toLocaleString()} ${t.items[recipe.primary]|| (recipe.primary.charAt(0).toUpperCase() + recipe.primary.slice(1))}</span> ${t.stepAnd} <span class="highlight">${cat1Needed.toLocaleString()} ${t.items[recipe.cat1]|| (recipe.cat1.charAt(0).toUpperCase() + recipe.cat1.slice(1))}</span> ${t.stepAnd} <span class="highlight">${cat2Needed.toLocaleString()} ${t.items[recipe.cat2]|| (recipe.cat2.charAt(0).toUpperCase() + recipe.cat2.slice(1))}</span></strong>`;
             
             steps.unshift({
                 htmlAction: htmlStr,
                 mainYields: [{ item: item, amount: missing }],
-                byproducts: []
+                byproducts: [],
+                stepKey: stepKey,
+                routeStats: availableRoutes.length > 1 ? routeStats : [],
+                selectedRoute: routeName
             });
             
             decompose(recipe.primary, primaryNeeded);
             decompose(recipe.cat1, cat1Needed);
             decompose(recipe.cat2, cat2Needed);
+            
+        } else if (recipe.type === 'smelt') {
+            const oreNeeded = Math.ceil(missing / (recipe.oreYield * mR));
+            const catNeeded = Math.ceil(oreNeeded * recipe.catReq);
+
+            let htmlStr = `<strong>${t.stepSmelt || 'Smelt'} <span class="highlight">${oreNeeded.toLocaleString()} ${t.items[recipe.ore]|| (recipe.ore.charAt(0).toUpperCase() + recipe.ore.slice(1))}</span> ${t.stepWith} <span class="highlight">${catNeeded.toLocaleString()} ${t.items[recipe.cat]|| (recipe.cat.charAt(0).toUpperCase() + recipe.cat.slice(1))}</span></strong>`;
+
+            steps.unshift({
+                htmlAction: htmlStr,
+                mainYields: [{ item: item, amount: missing }],
+                byproducts: [],
+                stepKey: stepKey,
+                routeStats: availableRoutes.length > 1 ? routeStats : [],
+                selectedRoute: routeName
+            });
+
+            decompose(recipe.ore, oreNeeded);
+            decompose(recipe.cat, catNeeded);
         }
     }
 
@@ -102,11 +153,10 @@ function resolveExtractions(deficits, mE, mM, bankData) {
     let bp = {};
     let extSteps = [];
 
-    // Must map backwards logically so missing requirements trigger in the right order
     const sequence = [
         'skadite', 'electrum', 'gemmetal', 'sanguinite', 'almine', 'acronite', 'lupium',
-        'pi', 'cuprum', 'coke', 'pitch', 'ichor',
-        'bo', 'pyroxene', 'galbinum', 'redbleckblende', 'maalite', 'pyropite', 'aabam', 'calamine', 'silver', 'chalkglance', 'waterstone',
+        'pi', 'cuprum', 'coke', 'pitch', 'ichor', 'sulfur',
+        'bo', 'pyroxene', 'galbinum', 'redbleckblende', 'maalite', 'pyropite', 'kyanite', 'aabam', 'calamine', 'silver', 'chalkglance', 'waterstone',
         'bleck', 'bleckblende', 'jadeite', 'malachite', 'sp', 'granumpowder', 'amarantum', 'flakestone', 'calspar', 'coal', 'cp', 'cinnabar', 'magmum', 'volcanicash', 'pyrite', 'gaborepowder', 'lodestonepowder', 'ritualash'
     ];
 
@@ -182,10 +232,17 @@ function resolveExtractions(deficits, mE, mM, bankData) {
                     routeName = availableRoutes[0];
                 }
 
-                userPathChoices[stepKey] = routeName;
-                let route = EXTRACTION_ROUTES[source][routeName];
-
                 let maxSourceReq = routeStats.find(s => s.name === routeName)?.req || 0;
+
+                if (maxSourceReq === 0) {
+                    let validRoute = routeStats.find(s => s.req > 0);
+                    if (validRoute) {
+                        routeName = validRoute.name;
+                        maxSourceReq = validRoute.req;
+                    }
+                }
+
+                let route = EXTRACTION_ROUTES[source][routeName];
 
                 if (maxSourceReq > 0) {
                     raw[source] = (raw[source] || 0) + maxSourceReq;
@@ -226,9 +283,9 @@ function resolveExtractions(deficits, mE, mM, bankData) {
 
                     const t = i18n[currentLang];
                     let action = t[route.action] || route.action;
-                    let htmlAction = `<strong>${action} <span class="highlight">${maxSourceReq.toLocaleString()} ${t.items[source]||source}</span>`;
+                    let htmlAction = `<strong>${action} <span class="highlight">${maxSourceReq.toLocaleString()} ${t.items[source]|| (source.charAt(0).toUpperCase() + source.slice(1))}</span>`;
                     if (catQty > 0 && route.cat) {
-                        htmlAction += ` ${t.stepWith} <span class="highlight">${catQty.toLocaleString()} ${t.items[route.cat]||route.cat}</span>`;
+                        htmlAction += ` ${t.stepWith} <span class="highlight">${catQty.toLocaleString()} ${t.items[route.cat]|| (route.cat.charAt(0).toUpperCase() + route.cat.slice(1))}</span>`;
                     }
                     htmlAction += `</strong>`;
 
@@ -244,9 +301,7 @@ function resolveExtractions(deficits, mE, mM, bankData) {
                     processing = true;
                     break; 
                 } else {
-                    itemsFromSource.forEach(k => {
-                        if (!route.yields[k]) EXTRACT_MAP[k] = null; 
-                    });
+                    itemsFromSource.forEach(k => delete raw[k]);
                     processing = true;
                     break;
                 }

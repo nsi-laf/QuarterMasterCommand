@@ -2,6 +2,7 @@ function openModal(modalId) {
     document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
     document.getElementById(modalId).style.display = 'block';
     if(modalId === 'settingsModal') switchTab('prefs');
+    if(modalId === 'helpModal') switchHelpTab('guide');
 }
 
 function closeModal(modalId) {
@@ -15,10 +16,17 @@ window.onclick = function(event) {
 }
 
 function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('#settingsModal .tab-content').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('#settingsModal .tab-btn').forEach(el => el.classList.remove('active'));
     document.getElementById('tab_' + tabId).style.display = 'block';
     document.getElementById('tabBtn_' + tabId).classList.add('active');
+}
+
+function switchHelpTab(tabId) {
+    document.querySelectorAll('#helpModal .tab-content').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('#helpModal .tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab_help_' + tabId).style.display = 'block';
+    document.getElementById('tabBtn_help_' + tabId).classList.add('active');
 }
 
 function toggleCollapse(id) {
@@ -79,7 +87,7 @@ function changeLang() {
         'viewBank', 'viewCart', 'viewGather', 'viewPipe', 'btnRestart', 'legend', 'legCP', 'legSP',
         'legBO', 'legPI', 'legGS', 'legStk', 'legBest', 'legMax', 'legRegion', 'viewLegend', 'btnBank', 'btnCart', 
         'btnSettings', 'btnActions', 'btnHelp', 'btnClearCart', 'modalActionsTitle', 'viewLang',
-        'prefRoute', 'actCart', 'actDiscord', 'actPipe', 'viewPers', 'viewVis'
+        'prefRoute', 'actCart', 'actDiscord', 'actPipe', 'viewPers', 'viewVis', 'tabGuide', 'tabLegend', 'legBestTxt', 'legMaxTxt', 'legRegionTxt'
     ];
     
     const htmlElements = [

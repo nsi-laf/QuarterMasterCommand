@@ -1,4 +1,4 @@
-const CACHE_NAME = 'qm-store-v8.0';
+const CACHE_NAME = 'qm-store-v8.2';
 const ASSETS = [
     './',
     './index.html',

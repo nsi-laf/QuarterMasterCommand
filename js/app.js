@@ -17,17 +17,46 @@ function handleModeChange() {
 
     Object.values(CATEGORIES).flatMap(c => c.items).forEach(k => convert('b_' + k));
     
-    rawKeys.forEach(k => {
-        marketData[k].forEach(tier => {
-            if (prevMode === 'units' && mode === 'stacks') tier.q = parseFloat((tier.q / 10000).toFixed(4));
-            else if (prevMode === 'stacks' && mode === 'units') tier.q = Math.round(tier.q * 10000);
-        });
+    Object.values(CATEGORIES).flatMap(c => c.items).forEach(k => {
+        if(marketData[k]) {
+            marketData[k].forEach(tier => {
+                if (prevMode === 'units' && mode === 'stacks') tier.q = parseFloat((tier.q / 10000).toFixed(4));
+                else if (prevMode === 'stacks' && mode === 'units') tier.q = Math.round(tier.q * 10000);
+            });
+        }
     });
 
     prevMode = mode; 
     renderBankTable();
     renderMarketTable();
-    run();
+    handlePipelineChange();
+}
+
+function targetMetalChanged() {
+    const metal = document.getElementById('targetMetal').value;
+    const recipeRow = document.getElementById('recipeRow');
+    const recipeSelect = document.getElementById('targetRecipe');
+    
+    let recipesObj = RECIPES[metal];
+    if (recipesObj && Object.keys(recipesObj).length > 1) {
+        recipeRow.style.display = 'flex';
+        recipeSelect.innerHTML = '';
+        Object.keys(recipesObj).forEach(rName => {
+            let sel = (userPathChoices[`recipe_${metal}`] === rName) ? 'selected' : '';
+            recipeSelect.innerHTML += `<option value="${rName}" ${sel}>${rName}</option>`;
+        });
+    } else {
+        recipeRow.style.display = 'none';
+    }
+    
+    handlePipelineChange();
+}
+
+function targetRecipeChanged() {
+    const metal = document.getElementById('targetMetal').value;
+    const val = document.getElementById('targetRecipe').value;
+    userPathChoices[`recipe_${metal}`] = val;
+    handlePipelineChange();
 }
 
 function run() { clearTimeout(timer); timer = setTimeout(calculate, 150); }
@@ -72,7 +101,7 @@ function calculateMax() {
     if (maxPossible === 0) maxPossible = mode === 'stacks' ? 10000 : 1;
     document.getElementById('targetAmount').value = mode === 'stacks' ? parseFloat((maxPossible / 10000).toFixed(4)) : maxPossible;
     
-    calculate();
+    handlePipelineChange();
 }
 
 function calculate() {
@@ -83,16 +112,13 @@ function calculate() {
     const targetMetal = document.getElementById('targetMetal').value;
     const mult = mode === 'stacks' ? 10000 : 1;
     
-    const bank = {}; 
-    Object.values(CATEGORIES).flatMap(c => c.items).forEach(k => bank[k] = (Number(document.getElementById('b_' + k)?.value) || 0) * mult);
-
     if (targetRaw <= 0) {
         document.getElementById('gatherOutput').innerHTML = `<div class="empty-msg">${t.noTarget}</div>`;
         document.getElementById('stepsOutput').innerHTML = "";
         document.getElementById('statStacks').innerText = "0.00";
         if(document.getElementById('cartTotalGold')) document.getElementById('cartTotalGold').innerText = "0.00 g";
         pipelineStepsRaw = []; byproductsRaw = {}; pureDeficits = {};
-        rawKeys.forEach(k => {
+        Object.values(CATEGORIES).flatMap(c => c.items).forEach(k => {
             if(document.getElementById('cost_'+k)) document.getElementById('cost_'+k).innerText = "0.00";
             if(document.getElementById('stash_'+k)) document.getElementById('stash_'+k).innerText = "0";
         });
@@ -104,61 +130,75 @@ function calculate() {
     const mE = document.getElementById('modExt').checked ? 1.03 : 1;
     const mM = document.getElementById('modMast').checked ? 1.06 : 1;
 
-    const tree = resolveTree(targetMetal, targetRaw * mult, bank, mR);
-    const extractions = resolveExtractions(tree.deficits, mE, mM, bank);
-    
-    pureDeficits = extractions.raw;
-    const grossRaw = extractions.grossRaw; 
-    byproductsRaw = extractions.bp;
-    
-    let totalGold = 0; let totalUnits = 0; let purchased = {}; let gHTML = '';
-    
-    rawKeys.forEach(k => {
+    const bank = {}; 
+    const purchased = {};
+    let totalGold = 0;
+
+    Object.values(CATEGORIES).flatMap(c => c.items).forEach(k => {
+        bank[k] = (Number(document.getElementById('b_' + k)?.value) || 0) * mult;
+        
+        let buyQtyUnits = 0;
+        if(marketData[k]) {
+            marketData[k].forEach(tier => {
+                const tierUnits = tier.q * mult;
+                buyQtyUnits += tierUnits;
+                totalGold += (tierUnits / 10000) * tier.p;
+            });
+        }
+        purchased[k] = buyQtyUnits;
+
         const costEl = document.getElementById('cost_' + k);
         const stashEl = document.getElementById('stash_' + k);
         
-        let buyQtyUnits = 0;
-        let bankQtyRaw = Number(document.getElementById('b_' + k)?.value) || 0;
-        
-        marketData[k].forEach(tier => {
-            const tierUnits = tier.q * mult;
-            buyQtyUnits += tierUnits;
-            totalGold += (tierUnits / 10000) * tier.p;
-        });
-
-        purchased[k] = buyQtyUnits;
-        let buyQtyRaw = buyQtyUnits / mult;
-        
         if (costEl) {
             let totalCostThisItem = 0;
-            marketData[k].forEach(tier => { totalCostThisItem += (tier.q * (mode === 'stacks' ? 1 : 0.0001)) * tier.p; });
+            if(marketData[k]) {
+                marketData[k].forEach(tier => { totalCostThisItem += (tier.q * (mode === 'stacks' ? 1 : 0.0001)) * tier.p; });
+            }
             costEl.innerText = totalCostThisItem.toFixed(2);
         }
         if (stashEl) {
-            const stashRaw = bankQtyRaw + buyQtyRaw;
+            const stashRaw = (bank[k] + purchased[k]) / mult;
             stashEl.innerText = mode === 'stacks' ? stashRaw.toFixed(2) + " Stk" : stashRaw.toLocaleString();
         }
     });
 
     if(document.getElementById('cartTotalGold')) document.getElementById('cartTotalGold').innerText = totalGold.toFixed(2) + " g";
 
-    Object.keys(pureDeficits).forEach(k => {
-        const remainingToGather = Math.max(0, pureDeficits[k] - (purchased[k] || 0));
-        let totalNeeded = grossRaw[k] || pureDeficits[k];
-        let amountAcquired = totalNeeded - remainingToGather;
-        let progressPct = totalNeeded > 0 ? Math.min(100, Math.max(0, (amountAcquired / totalNeeded) * 100)) : 0;
+    const baseTree = resolveTree(targetMetal, targetRaw * mult, bank, mR);
+    const baseExtractions = resolveExtractions(baseTree.deficits, mE, mM, bank);
+    pureDeficits = baseExtractions.raw;
 
-        if (remainingToGather > 0) {
-            totalUnits += remainingToGather;
-            const fmtVal = mode === 'stacks' ? (remainingToGather/10000).toFixed(2) + " Stk" : remainingToGather.toLocaleString();
-            gHTML += `<div class="logistics-item ${remainingToGather < 10000 ? 'hm-low' : 'hm-high'}" style="--prog: ${progressPct}%;"><span>${t.items[k]||k}</span><span>${fmtVal}</span></div>`;
+    const virtualBank = {};
+    Object.keys(bank).forEach(k => virtualBank[k] = bank[k] + purchased[k]);
+
+    const actualTree = resolveTree(targetMetal, targetRaw * mult, virtualBank, mR);
+    const actualExtractions = resolveExtractions(actualTree.deficits, mE, mM, virtualBank);
+    
+    const finalDeficits = actualExtractions.raw;
+    byproductsRaw = actualExtractions.bp;
+    
+    let gHTML = '';
+    let totalGatherUnits = 0;
+
+    Object.keys(finalDeficits).forEach(k => {
+        if (finalDeficits[k] > 0 && GATHERABLE_STONES.includes(k)) {
+            totalGatherUnits += finalDeficits[k];
+            const fmtVal = mode === 'stacks' ? (finalDeficits[k]/10000).toFixed(2) + " Stk" : finalDeficits[k].toLocaleString();
+            
+            let totalNeeded = baseExtractions.grossRaw[k] || finalDeficits[k];
+            let amountAcquired = totalNeeded - finalDeficits[k];
+            let progressPct = totalNeeded > 0 ? Math.min(100, Math.max(0, (amountAcquired / totalNeeded) * 100)) : 0;
+
+            let itemName = t.items[k] || (k.charAt(0).toUpperCase() + k.slice(1));
+            gHTML += `<div class="logistics-item ${finalDeficits[k] < 10000 ? 'hm-low' : 'hm-high'}" style="--prog: ${progressPct}%;"><span>${itemName}</span><span>${fmtVal}</span></div>`;
         }
     });
 
-    document.getElementById('gatherOutput').innerHTML = totalUnits > 0 ? gHTML : `<div class="empty-msg">${t.allCovered}</div>`;
-    document.getElementById('statStacks').innerText = (totalUnits / 10000).toFixed(2);
+    document.getElementById('gatherOutput').innerHTML = totalGatherUnits > 0 ? gHTML : `<div class="empty-msg">${t.allCovered}</div>`;
+    document.getElementById('statStacks').innerText = (totalGatherUnits / 10000).toFixed(2);
 
-    let newPipeline = [...extractions.extSteps, ...tree.steps];
+    let newPipeline = [...actualExtractions.extSteps, ...actualTree.steps];
     
     if (JSON.stringify(newPipeline) !== JSON.stringify(pipelineStepsRaw)) {
         completedSteps = [];
@@ -176,8 +216,15 @@ function calculate() {
             return `<span class="highlight">${Math.ceil(num / crafters).toLocaleString()}`;
         });
 
-        let mainYieldsStr = stepObj.mainYields ? stepObj.mainYields.map(y => `<span class="highlight">${y.amount.toLocaleString()} ${t.items[y.item]||y.item}</span>`).join(', ') : "";
-        let bpYieldsStr = (stepObj.byproducts && stepObj.byproducts.length > 0) ? stepObj.byproducts.map(y => `${y.amount.toLocaleString()} ${t.items[y.item]||y.item}`).join(', ') : "None";
+        let mainYieldsStr = (stepObj.mainYields && stepObj.mainYields.length > 0) ? stepObj.mainYields.map(y => {
+            let yName = t.items[y.item] || (y.item.charAt(0).toUpperCase() + y.item.slice(1));
+            return `<span class="highlight">${y.amount.toLocaleString()} ${yName}</span>`;
+        }).join(', ') : "";
+        
+        let bpYieldsStr = (stepObj.byproducts && stepObj.byproducts.length > 0) ? stepObj.byproducts.map(y => {
+            let yName = t.items[y.item] || (y.item.charAt(0).toUpperCase() + y.item.slice(1));
+            return `${y.amount.toLocaleString()} ${yName}`;
+        }).join(', ') : "None";
 
         let routeHtml = '';
         if (stepObj.routeStats && stepObj.routeStats.length > 1) {
@@ -187,7 +234,9 @@ function calculate() {
                 if (rs.isBestYield) badges += `<span title="${t.tooltipBestYield || 'Most Efficient'}" style="margin-left:4px; font-size:11px;">⭐</span>`;
                 if (rs.isMaxYield) badges += `<span title="${t.tooltipMaxYield || 'Max Byproducts Generated'}" style="margin-left:4px; font-size:11px;">💎</span>`;
                 if (rs.isRegionLocked) badges += `<span title="${t.tooltipRegionLocked || 'Region Locked Machine'}" style="margin-left:4px; font-size:11px;">🌍</span>`;
-                return `<button class="btn-route ${isActive}" onclick="event.stopPropagation(); updatePathChoice('${stepObj.stepKey}', '${rs.name}')">${rs.name}${badges}</button>`;
+                let safeStepKey = stepObj.stepKey.replace(/'/g, "\\'");
+                let safeRouteName = rs.name.replace(/'/g, "\\'");
+                return `<button class="btn-route ${isActive}" onclick="updatePathChoice(event, '${safeStepKey}', '${safeRouteName}')">${rs.name}${badges}</button>`;
             }).join('');
             routeHtml = `<div class="route-choices">${btns}</div>`;
         }
@@ -207,8 +256,9 @@ function calculate() {
     let byproductsString = "";
     Object.keys(byproductsRaw).forEach(k => {
         if (byproductsRaw[k] > 0) {
+            let itemName = t.items[k] || (k.charAt(0).toUpperCase() + k.slice(1));
             byproductsString += `<div style="display:flex; justify-content:space-between; margin-bottom: 2px;">
-                <span>${t.items[k] || k}</span>
+                <span>${itemName}</span>
                 <span style="color: var(--accent); font-weight: bold;">${byproductsRaw[k].toLocaleString()}</span>
             </div>`;
         }
@@ -237,4 +287,5 @@ window.onload = () => {
     load(); 
     document.getElementById('lang').value = currentLang; 
     changeLang(); 
+    targetMetalChanged(); 
 };

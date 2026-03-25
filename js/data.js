@@ -1,5 +1,6 @@
 const rawKeys = ['granum', 'calx', 'saburra', 'tephra', 'gabore', 'kimurite', 'bor', 'rockoil', 'dragonsalt', 'ichor', 'sulfur', 'tallow'];
 const defaultPrices = { granum: 15, calx: 35, saburra: 15, tephra: 50, gabore: 25, kimurite: 200, bor: 120, rockoil: 50, dragonsalt: 100, ichor: 150, sulfur: 30, tallow: 10 };
+const GATHERABLE_STONES = ['granum', 'calx', 'saburra', 'tephra', 'gabore', 'kimurite', 'lodestone', 'water'];
 
 const CATEGORIES = [
     { id: 'raw', items: ['granum', 'calx', 'saburra', 'tephra', 'gabore', 'kimurite', 'lodestone', 'water'] },
@@ -15,22 +16,33 @@ const EXTRACT_MAP = {
     almine: 'pyroxene', acronite: 'pyroxene', lupium: 'galbinum',
     pyroxene: 'galbinum', galbinum: 'tephra', redbleckblende: 'tephra',
     bo: 'granum', maalite: 'magmum', pyropite: 'magmum', kyanite: 'magmum', aabam: 'redbleckblende', calamine: 'amarantum', 
-    silver: 'redbleckblende', chalkglance: 'calspar', cuprum: 'malachite', pi: 'bo', coke: 'coal', pitch: 'coal', ichor: 'cinnabar', sulfur: 'cinnabar',
+    silver: 'electrum', chalkglance: 'calspar', cuprum: 'malachite', pi: 'bo', coke: 'coal', pitch: 'coal', ichor: 'cinnabar', sulfur: 'cinnabar',
     bleck: 'bleckblende', bleckblende: 'saburra', jadeite: 'saburra', malachite: 'saburra', sp: 'saburra',
     granumpowder: 'granum', amarantum: 'granum', flakestone: 'granum', calspar: 'calx', coal: 'calx', 
     cp: 'calx', cinnabar: 'tephra', magmum: 'tephra', volcanicash: 'tephra', pyrite: 'saburra',
-    gaborepowder: 'gabore', lodestonepowder: 'lodestone', ritualash: 'risensacrificecarcass', gold: 'electrum'
+    gaborepowder: 'gabore', lodestonepowder: 'lodestone', ritualash: 'risensacrificecarcass', gold: 'electrum', waterstone: 'kimurite'
 };
 
 const RECIPES = {
-    oghmium: { type: 'alloy', primary: 'tungsteel', cat1: 'cronite', cat2: 'sanguinite' },
-    tungsteel: { type: 'alloy', primary: 'gs', cat1: 'lupium', cat2: 'granumpowder' },
-    cronite: { type: 'alloy', primary: 'gs', cat1: 'almine', cat2: 'acronite' },
-    steel: { type: 'alloy', primary: 'gs', cat1: 'coal', cat2: 'sp' },
-    gs: { type: 'alloy', primary: 'pi', cat1: 'cp', cat2: 'coke' },
-    tmessing: { type: 'alloy', primary: 'messing', cat1: 'almine', cat2: 'gemmetal' },
-    messing: { type: 'alloy', primary: 'cuprum', cat1: 'calamine', cat2: 'sp' },
-    bron: { type: 'alloy', primary: 'cuprum', cat1: 'bleckblende', cat2: 'sp' }
+    oghmium: { "Alloy": { type: 'alloy', primary: 'tungsteel', cat1: 'cronite', cat2: 'sanguinite' } },
+    tungsteel: { "Alloy": { type: 'alloy', primary: 'gs', cat1: 'lupium', cat2: 'granumpowder' } },
+    cronite: { "Alloy": { type: 'alloy', primary: 'gs', cat1: 'almine', cat2: 'acronite' } },
+    steel: { 
+        "Alloy (Coal)": { type: 'alloy', primary: 'gs', cat1: 'coal', cat2: 'sp' },
+        "Alloy (Coke)": { type: 'alloy', primary: 'gs', cat1: 'coke', cat2: 'sp' }
+    },
+    gs: { 
+        "Alloy (Coke)": { type: 'alloy', primary: 'pi', cat1: 'cp', cat2: 'coke' },
+        "Alloy (Coal)": { type: 'alloy', primary: 'pi', cat1: 'cp', cat2: 'coal' }
+    },
+    tmessing: { "Alloy": { type: 'alloy', primary: 'messing', cat1: 'almine', cat2: 'gemmetal' } },
+    messing: { 
+        "Alloy (Calamine)": { type: 'alloy', primary: 'cuprum', cat1: 'calamine', cat2: 'sp' },
+        "Alloy (Bor)": { type: 'alloy', primary: 'cuprum', cat1: 'bor', cat2: 'sp' }
+    },
+    bron: { "Alloy": { type: 'alloy', primary: 'cuprum', cat1: 'bleckblende', cat2: 'sp' } },
+    pi: { "Smelt": { type: 'smelt', ore: 'bo', oreYield: 0.40, cat: 'coke', catReq: 0.0385 } },
+    cuprum: { "Smelt": { type: 'smelt', ore: 'malachite', oreYield: 0.50, cat: 'bor', catReq: 0.0715 } }
 };
 
 const EXTRACTION_ROUTES = {
@@ -83,10 +95,6 @@ const EXTRACTION_ROUTES = {
         "Natorus (Rock Oil)": { action: 'stepExtract', cat: "rockoil", catReq: 0.0417, yields: { bleck: 0.5400 } },
         "Furnace (Bor)": { action: 'stepFurnace', cat: "bor", catReq: 0.0715, yields: { bleck: 0.1920 } },
         "Furnace (Rock Oil)": { action: 'stepFurnace', cat: "rockoil", catReq: 0.0417, yields: { bleck: 0.1920 } }
-    },
-    bo: {
-        "Furnace": { action: 'stepFurnace', cat: "coke", catReq: 0.0385, yields: { pi: 0.4000 } },
-        "Blast Furnace": { action: 'stepBlastFurnace', cat: "coke", catReq: 0.0385, yields: { pi: 0.5000 } }
     },
     calspar: {
         "Blast Furnace (Dragon Salt)": { action: 'stepBlastFurnace', cat: "dragonsalt", catReq: 0.0187, yields: { chalkglance: 0.0700, electrum: 0.0224, malachite: 0.2064 } },

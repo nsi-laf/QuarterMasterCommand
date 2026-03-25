@@ -1,27 +1,64 @@
+function clearPipelineProgress() {
+    if (completedSteps.length === 0) return;
+    
+    const isStacks = document.getElementById('mode').value === 'stacks';
+    
+    completedSteps.forEach(index => {
+        const stepObj = pipelineStepsRaw[index];
+        if(!stepObj) return;
+        
+        let allYields = [];
+        if (stepObj.mainYields) allYields.push(...stepObj.mainYields);
+        if (stepObj.byproducts) allYields.push(...stepObj.byproducts);
+
+        allYields.forEach(y => {
+            const bankInput = document.getElementById('b_' + y.item);
+            if (bankInput) {
+                let current = Number(bankInput.value) || 0;
+                let sub = isStacks ? y.amount / 10000 : y.amount;
+                bankInput.value = Math.max(0, current - sub).toFixed(isStacks ? 4 : 0);
+            }
+        });
+    });
+    
+    completedSteps = [];
+    focusIndex = 0;
+}
+
+function handlePipelineChange() {
+    clearPipelineProgress();
+    save();
+    run();
+}
+
 function toggleGlobalPref(prefType) {
+    clearPipelineProgress();
     if (globalRoutePref === prefType) {
         globalRoutePref = null;
-        document.getElementById('btnPrefEfficient').classList.remove('active-global');
-        document.getElementById('btnPrefYield').classList.remove('active-global');
+        document.getElementById('btnPrefEfficient')?.classList.remove('active-global');
+        document.getElementById('btnPrefYield')?.classList.remove('active-global');
     } else {
         globalRoutePref = prefType;
         if(prefType === 'efficient') {
-            document.getElementById('btnPrefEfficient').classList.add('active-global');
-            document.getElementById('btnPrefYield').classList.remove('active-global');
+            document.getElementById('btnPrefEfficient')?.classList.add('active-global');
+            document.getElementById('btnPrefYield')?.classList.remove('active-global');
         } else if (prefType === 'yield') {
-            document.getElementById('btnPrefYield').classList.add('active-global');
-            document.getElementById('btnPrefEfficient').classList.remove('active-global');
+            document.getElementById('btnPrefYield')?.classList.add('active-global');
+            document.getElementById('btnPrefEfficient')?.classList.remove('active-global');
         }
     }
     save();
     run();
 }
 
-function updatePathChoice(stepKey, selectedRoute) {
+function updatePathChoice(e, stepKey, selectedRoute) {
+    if (e) e.stopPropagation(); 
+    
+    clearPipelineProgress();
     if (globalRoutePref !== null) {
         globalRoutePref = null;
-        document.getElementById('btnPrefEfficient').classList.remove('active-global');
-        document.getElementById('btnPrefYield').classList.remove('active-global');
+        document.getElementById('btnPrefEfficient')?.classList.remove('active-global');
+        document.getElementById('btnPrefYield')?.classList.remove('active-global');
     }
     userPathChoices[stepKey] = selectedRoute;
     save();
@@ -131,27 +168,7 @@ function toggleStep(index) {
 
 function restartPipeline() {
     if (!confirm(i18n[currentLang].restartPrompt || "Restart the pipeline? This will un-check all steps and remove their yields from your bank.")) return;
-    
-    const isStacks = document.getElementById('mode').value === 'stacks';
-    completedSteps.forEach(index => {
-        const stepObj = pipelineStepsRaw[index];
-        
-        let allYields = [];
-        if (stepObj.mainYields) allYields.push(...stepObj.mainYields);
-        if (stepObj.byproducts) allYields.push(...stepObj.byproducts);
-
-        allYields.forEach(y => {
-            const bankInput = document.getElementById('b_' + y.item);
-            if (bankInput) {
-                let current = Number(bankInput.value) || 0;
-                let sub = isStacks ? y.amount / 10000 : y.amount;
-                bankInput.value = Math.max(0, current - sub).toFixed(isStacks ? 4 : 0);
-            }
-        });
-    });
-    
-    completedSteps = [];
-    focusIndex = 0;
+    clearPipelineProgress();
     updatePipelineVisuals();
     if(pipelineViewMode === 'focus') updateFocusView();
     save();

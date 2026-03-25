@@ -17,9 +17,11 @@ function buildDiscordMessage() {
     if (bankString !== "") msg += `**CURRENT BANK STOCK:**\n\`\`\`\n${bankString}\`\`\`\n`;
 
     let marketString = ""; let hasMarket = false;
-    rawKeys.forEach(k => {
+    Object.values(CATEGORIES).flatMap(c => c.items).forEach(k => {
         let totalQty = 0;
-        marketData[k].forEach(tier => totalQty += tier.q);
+        if(marketData[k]) {
+            marketData[k].forEach(tier => totalQty += tier.q);
+        }
         if (totalQty > 0 && relevant.has(k)) {
             let fmtAmt = mode === 'stacks' ? totalQty.toFixed(2) + " Stacks" : totalQty.toLocaleString();
             marketString += `- ${t.items[k]||k}: ${fmtAmt}\n`;
@@ -64,7 +66,7 @@ function copyDiscord() { navigator.clipboard.writeText(buildDiscordMessage()); a
 async function sendToDiscord() {
     const t = i18n[currentLang];
     const webhookUrl = document.getElementById('webhookUrl').value;
-    if (!webhookUrl || !webhookUrl.startsWith('https://discord.com/api/webhooks/')) { alert(t.errWebhook); openSettings('integ'); return; }
+    if (!webhookUrl || !webhookUrl.startsWith('https://discord.com/api/webhooks/')) { alert(t.errWebhook); openModal('settingsModal'); return; }
 
     try {
         const response = await fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: buildDiscordMessage(), username: "Quartermaster Command", avatar_url: "https://i.imgur.com/B1pE1H7.png" }) });

@@ -13,7 +13,7 @@ let userPathChoices = {};
 let globalRoutePref = null; 
 
 let moduleVisibility = {
-    'mod_prodCmd': true, 'mod_yieldMods': true, 'mod_legend': true,
+    'mod_prodCmd': true, 'mod_yieldMods': true, 'mod_legend': false,
     'mod_invBank': false, 'mod_marketCart': false, 'mod_defGather': true, 'mod_mfgPipe': true
 };
 let customColors = { accent: null, bg: null, text: null };
@@ -94,20 +94,20 @@ function load() {
     
     prevMode = document.getElementById('mode').value || 'units';
 
-    if (globalRoutePref === 'efficient') document.getElementById('btnPrefEfficient').classList.add('active-global');
-    if (globalRoutePref === 'yield') document.getElementById('btnPrefYield').classList.add('active-global');
+    if (globalRoutePref === 'efficient') document.getElementById('btnPrefEfficient')?.classList.add('active-global');
+    if (globalRoutePref === 'yield') document.getElementById('btnPrefYield')?.classList.add('active-global');
 }
 
 function clearAll() {
     if(confirm(i18n[currentLang].resetPrompt)) {
         document.querySelectorAll('input[id^="b_"]').forEach(el => el.value = 0);
-        rawKeys.forEach(k => marketData[k] = [{ p: defaultPrices[k], q: 0 }]);
+        Object.values(CATEGORIES).flatMap(c => c.items).forEach(k => marketData[k] = [{ p: defaultPrices[k] || 0, q: 0 }]);
         document.getElementById('targetAmount').value = document.getElementById('mode').value === 'stacks' ? 1 : 10000;
         completedSteps = [];
         closeModal('settingsModal');
         closeModal('actionsModal');
         renderMarketTable();
-        run();
+        handlePipelineChange();
     }
 }
 
@@ -150,7 +150,7 @@ function loadShareCode() {
                 prevMode = state.s.m;
             }
         }
-        save(); renderBankTable(); renderMarketTable(); run();
+        save(); renderBankTable(); renderMarketTable(); handlePipelineChange();
         alert(i18n[currentLang].importSuccess || "Setup loaded successfully!");
     } catch(e) {
         alert(i18n[currentLang].importError || "Invalid code provided.");
