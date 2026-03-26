@@ -184,6 +184,10 @@ function calculate() {
         document.getElementById('row_chkBp').style.display = 'none';
         document.getElementById('bpContainer').style.display = 'none';
         if (document.getElementById('gatherProgressBar')) document.getElementById('gatherProgressBar').style.width = '0%';
+        if (document.getElementById('gatherProgressText')) {
+            document.getElementById('gatherProgressText').innerText = "0%";
+            document.getElementById('gatherProgressText').style.color = "var(--text)";
+        }
         if (document.getElementById('projectProgressBar')) document.getElementById('projectProgressBar').style.width = '0%';
         if (document.getElementById('projectProgressText')) {
             document.getElementById('projectProgressText').innerText = "0%";
@@ -237,10 +241,8 @@ function calculate() {
 
     if (document.getElementById('cartTotalGold')) document.getElementById('cartTotalGold').innerText = totalGold.toFixed(2) + " g";
 
-    const baseTree = resolveTree(targetMetal, targetRaw * mult, bank, mR);
-    const baseExtractions = resolveExtractions(baseTree.deficits, mE, mM, bank);
-
-    pureDeficits = { ...baseExtractions.raw };
+    const grossTree = resolveTree(targetMetal, targetRaw * mult, {}, mR);
+    const grossExtractions = resolveExtractions(grossTree.deficits, mE, mM, {});
 
     const virtualBank = {};
     Object.keys(bank).forEach(k => virtualBank[k] = bank[k] + purchased[k]);
@@ -248,31 +250,25 @@ function calculate() {
     const actualTree = resolveTree(targetMetal, targetRaw * mult, virtualBank, mR);
     const actualExtractions = resolveExtractions(actualTree.deficits, mE, mM, virtualBank);
 
-    const finalDeficits = { ...actualExtractions.raw };
-    if (actualTree.intermediates) {
-        Object.keys(actualTree.intermediates).forEach(k => {
-            finalDeficits[k] = (finalDeficits[k] || 0) + actualTree.intermediates[k];
-        });
-    }
-    if (actualExtractions.extracted) {
-        Object.keys(actualExtractions.extracted).forEach(k => {
-            finalDeficits[k] = (finalDeficits[k] || 0) + actualExtractions.extracted[k];
-        });
-    }
+    const baseTree = resolveTree(targetMetal, targetRaw * mult, bank, mR);
+    const baseExtractions = resolveExtractions(baseTree.deficits, mE, mM, bank);
+    pureDeficits = { ...baseExtractions.raw };
 
-    const baseGross = { ...(baseExtractions.grossRaw || baseExtractions.raw) };
-    if (baseTree.deficits) {
-        Object.keys(baseTree.deficits).forEach(k => {
-            baseGross[k] = (baseGross[k] || 0) + baseTree.deficits[k];
-        });
-    }
+    const finalDeficits = {};
+    [...Object.keys(actualTree.intermediates), ...Object.keys(actualExtractions.raw), ...Object.keys(actualExtractions.extracted)].forEach(k => {
+        let missing = 0;
+        if (actualExtractions.raw[k]) missing += actualExtractions.raw[k];
+        if (actualTree.intermediates[k]) missing += actualTree.intermediates[k];
+        if (actualExtractions.extracted[k]) missing += actualExtractions.extracted[k];
+        if (missing > 0) finalDeficits[k] = missing;
+    });
 
     byproductsRaw = actualExtractions.bp;
 
     window.activeResources = new Set();
-    Object.keys(baseGross).forEach(k => window.activeResources.add(k));
-    if (actualTree.intermediates) Object.keys(actualTree.intermediates).forEach(k => window.activeResources.add(k));
-    if (actualExtractions.extracted) Object.keys(actualExtractions.extracted).forEach(k => window.activeResources.add(k));
+    [...Object.keys(grossExtractions.raw), ...Object.keys(grossTree.intermediates), ...Object.keys(grossExtractions.extracted)].forEach(k => {
+        window.activeResources.add(k);
+    });
 
     let gHTML = '';
     let totalGatherUnits = 0;
@@ -282,17 +278,24 @@ function calculate() {
     CATEGORIES.forEach(cat => {
         let catHtml = '';
         cat.items.forEach(k => {
-            if (finalDeficits[k] > 0 && k !== targetMetal) {
+            let totalNeeded = (grossExtractions.raw[k] || 0) + (grossTree.intermediates[k] || 0) + (grossExtractions.extracted[k] || 0);
+
+            if (totalNeeded > 0 && k !== targetMetal) {
+                let isComplete = false;
+                let missingAmt = finalDeficits[k] || 0;
+
                 if (actualExtractions.raw[k]) {
                     totalGatherUnits += actualExtractions.raw[k];
                 }
 
-                const fmtVal = mode === 'stacks' ? (finalDeficits[k] / 10000).toFixed(2) + " Stk" : finalDeficits[k].toLocaleString();
+                if (missingAmt <= 0) {
+                    missingAmt = 0;
+                    isComplete = true;
+                }
 
-                let totalNeeded = (baseGross[k] || 0) + (actualTree.intermediates ? (actualTree.intermediates[k] || 0) : 0) + (actualExtractions.extracted ? (actualExtractions.extracted[k] || 0) : 0);
-                if (totalNeeded < finalDeficits[k]) totalNeeded = finalDeficits[k];
+                const fmtVal = mode === 'stacks' ? (missingAmt / 10000).toFixed(2) + " Stk" : missingAmt.toLocaleString();
 
-                let amountAcquired = totalNeeded - finalDeficits[k];
+                let amountAcquired = totalNeeded - missingAmt;
                 let progressPct = totalNeeded > 0 ? Math.min(100, Math.max(0, (amountAcquired / totalNeeded) * 100)) : 0;
 
                 totalAcquiredUnits += amountAcquired;
@@ -303,13 +306,23 @@ function calculate() {
 
                 let itemName = (t.items && t.items[k]) ? t.items[k] : (k.charAt(0).toUpperCase() + k.slice(1));
 
-                catHtml += `<div class="logistics-item" style="border-left-color: ${colorStr}; --prog: ${progressPct}%; --hue: ${hue};">
-                    <span style="font-weight:bold; color:var(--text);">${itemName}</span>
-                    <div style="display: flex; align-items: center; justify-content: flex-end;">
-                        <span style="color:var(--text-dim); font-weight:normal; margin-right: 12px; text-align: right;">${fmtVal}</span>
-                        <span style="color:${colorStr}; font-weight: bold; text-align: right; min-width: 40px;">${progressPct.toFixed(0)}%</span>
-                    </div>
-                </div>`;
+                if (isComplete) {
+                    catHtml += `<div class="logistics-item" style="border-left-color: ${colorStr}; --prog: 100%; --hue: 120;">
+                        <span style="font-weight:bold; color:var(--text); text-decoration: line-through; opacity: 0.5;">${itemName}</span>
+                        <div style="display: flex; align-items: center; justify-content: flex-end;">
+                            <span style="color:var(--text-dim); font-weight:normal; margin-right: 12px; text-align: right; text-decoration: line-through; opacity: 0.5;">${fmtVal}</span>
+                            <span style="color:${colorStr}; font-weight: bold; text-align: right; min-width: 40px;">100%</span>
+                        </div>
+                    </div>`;
+                } else {
+                    catHtml += `<div class="logistics-item" style="border-left-color: ${colorStr}; --prog: ${progressPct}%; --hue: ${hue};">
+                        <span style="font-weight:bold; color:var(--text);">${itemName}</span>
+                        <div style="display: flex; align-items: center; justify-content: flex-end;">
+                            <span style="color:var(--text-dim); font-weight:normal; margin-right: 12px; text-align: right;">${fmtVal}</span>
+                            <span style="color:${colorStr}; font-weight: bold; text-align: right; min-width: 40px;">${progressPct.toFixed(0)}%</span>
+                        </div>
+                    </div>`;
+                }
             }
         });
         if (catHtml !== '') {
@@ -318,14 +331,21 @@ function calculate() {
         }
     });
 
-    document.getElementById('gatherOutput').innerHTML = totalGatherUnits > 0 ? gHTML : `<div class="empty-msg">${t.allCovered || 'All covered!'}</div>`;
+    document.getElementById('gatherOutput').innerHTML = totalNeededUnits > 0 ? gHTML : `<div class="empty-msg">${t.allCovered || 'All covered!'}</div>`;
     document.getElementById('statStacks').innerText = (totalGatherUnits / 10000).toFixed(2);
 
     let gatherOverallPct = totalNeededUnits > 0 ? (totalAcquiredUnits / totalNeededUnits) * 100 : 100;
     if (document.getElementById('gatherProgressBar')) {
         let hueBar = Math.floor((gatherOverallPct / 100) * 120);
+        let colorStr = `hsl(${hueBar}, 70%, 50%)`;
         document.getElementById('gatherProgressBar').style.width = gatherOverallPct + '%';
-        document.getElementById('gatherProgressBar').style.backgroundColor = `hsl(${hueBar}, 70%, 50%)`;
+        document.getElementById('gatherProgressBar').style.backgroundColor = colorStr;
+
+        let gatherTextEl = document.getElementById('gatherProgressText');
+        if (gatherTextEl) {
+            gatherTextEl.innerText = gatherOverallPct.toFixed(0) + '%';
+            gatherTextEl.style.color = colorStr;
+        }
     }
 
     let newPipeline = [...actualExtractions.extSteps, ...actualTree.steps];
@@ -370,7 +390,6 @@ function calculate() {
 
                 if (rs.name === stepObj.selectedRoute) classes.push('active');
 
-                // New logic: Applies acronym box completely separated from the machine's text name wrapper
                 if (rs.isBestYield) { classes.push('rt-eff'); badges.push('<span class="acronym-box acronym-eff">E</span>'); }
                 if (rs.isMaxYield) { classes.push('rt-max'); badges.push('<span class="acronym-box acronym-max">Y</span>'); }
                 if (rs.isRegionLocked) { classes.push('rt-reg'); badges.push('<span class="acronym-box acronym-reg">R</span>'); }
