@@ -71,6 +71,7 @@ function syncColorPickers() {
         }
     } catch (e) { }
 
+    // HTML input[type=color] expects exactly a 7 char hex (e.g. #FFFFFF)
     if (document.getElementById('colorAccent')) document.getElementById('colorAccent').value = cAccent;
     if (document.getElementById('colorBg')) document.getElementById('colorBg').value = cBg;
     if (document.getElementById('colorText')) document.getElementById('colorText').value = cText;

@@ -34,21 +34,23 @@ function handlePipelineChange() {
 function updatePrefVisuals() {
     const chkEff = document.getElementById('chkEff');
     const chkYld = document.getElementById('chkYld');
-    const lblEff = document.getElementById('ui_btnPrefEfficient');
-    const lblYld = document.getElementById('ui_btnPrefYield');
+    const rowEff = document.getElementById('row_chkEff');
+    const rowYld = document.getElementById('row_chkYld');
 
     if (chkEff && chkYld) {
         if (chkEff.checked) {
             chkYld.disabled = true;
-            if (lblYld) lblYld.style.opacity = '0.4';
+            if (rowYld) { rowYld.style.opacity = '0.4'; rowYld.style.pointerEvents = 'none'; }
+            if (rowEff) { rowEff.style.opacity = '1'; rowEff.style.pointerEvents = 'auto'; }
         } else if (chkYld.checked) {
             chkEff.disabled = true;
-            if (lblEff) lblEff.style.opacity = '0.4';
+            if (rowEff) { rowEff.style.opacity = '0.4'; rowEff.style.pointerEvents = 'none'; }
+            if (rowYld) { rowYld.style.opacity = '1'; rowYld.style.pointerEvents = 'auto'; }
         } else {
             chkEff.disabled = false;
             chkYld.disabled = false;
-            if (lblEff) lblEff.style.opacity = '1';
-            if (lblYld) lblYld.style.opacity = '1';
+            if (rowEff) { rowEff.style.opacity = '1'; rowEff.style.pointerEvents = 'auto'; }
+            if (rowYld) { rowYld.style.opacity = '1'; rowYld.style.pointerEvents = 'auto'; }
         }
     }
 }
@@ -153,20 +155,28 @@ function updatePipelineVisuals() {
     let percent = pipelineStepsRaw.length === 0 ? 100 : Math.round((completedSteps.length / pipelineStepsRaw.length) * 100);
     if (percent > 100) percent = 100;
 
-    const progBar = document.getElementById('projectProgress');
-    const progContainer = document.querySelector('.progress-container');
+    const progBar = document.getElementById('projectProgressBar');
     const progText = document.getElementById('projectProgressText');
-    const t = i18n[currentLang] || i18n['en'];
 
-    if (progBar) progBar.style.width = percent + '%';
-    if (progText) progText.innerText = `${percent}% ${t.pipeCompleted || 'Production Progress'}`;
+    // DYNAMIC COLOR UPDATES FOR PIPELINE PERCENTAGE
+    let hue = Math.floor((percent / 100) * 120);
+    let colorStr = `hsl(${hue}, 80%, 50%)`;
+
+    if (progBar) {
+        progBar.style.width = percent + '%';
+        progBar.style.backgroundColor = colorStr;
+    }
+    if (progText) {
+        progText.innerText = `${percent}%`;
+        progText.style.color = colorStr;
+        progText.style.fontWeight = 'bold';
+        progText.style.fontSize = '12px';
+    }
 
     if (percent === 100 && pipelineStepsRaw.length > 0) {
         if (progBar) progBar.classList.add('complete-pulse');
-        if (progContainer) progContainer.classList.add('complete-pulse');
     } else {
         if (progBar) progBar.classList.remove('complete-pulse');
-        if (progContainer) progContainer.classList.remove('complete-pulse');
     }
 }
 

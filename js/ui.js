@@ -9,17 +9,16 @@ function showToast(message) {
 function openModal(modalId) {
     document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
     document.getElementById(modalId).style.display = 'block';
-    if(modalId === 'settingsModal') switchTab('view');
-    if(modalId === 'helpModal') switchHelpTab('guide');
+    if (modalId === 'settingsModal') switchTab('view');
 }
 
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
 }
 
-window.onclick = function(event) { 
-    ['settingsModal', 'helpModal', 'bankModal', 'cartModal', 'prodModal'].forEach(id => {
-        if (event.target == document.getElementById(id)) closeModal(id); 
+window.onclick = function (event) {
+    ['settingsModal', 'helpModal', 'bankModal', 'cartModal', 'maxCraftModal', 'prefsModal'].forEach(id => {
+        if (event.target == document.getElementById(id)) closeModal(id);
     });
 }
 
@@ -28,13 +27,6 @@ function switchTab(tabId) {
     document.querySelectorAll('#settingsModal .tab-btn').forEach(el => el.classList.remove('active'));
     document.getElementById('tab_' + tabId).style.display = 'block';
     document.getElementById('tabBtn_' + tabId).classList.add('active');
-}
-
-function switchHelpTab(tabId) {
-    document.querySelectorAll('#helpModal .tab-content').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('#helpModal .tab-btn').forEach(el => el.classList.remove('active'));
-    document.getElementById('tab_help_' + tabId).style.display = 'block';
-    document.getElementById('tabBtn_help_' + tabId).classList.add('active');
 }
 
 function toggleCollapse(id) {
@@ -61,7 +53,7 @@ function toggleMainModule(modId, isVisible = null) {
     else el.classList.add('module-hidden');
 
     moduleVisibility[modId] = isVisible;
-    
+
     const checkboxId = modId.replace('mod_', 'view_');
     const checkbox = document.getElementById(checkboxId);
     if (checkbox) checkbox.checked = isVisible;
@@ -93,29 +85,29 @@ function setLang(code) {
 function changeLang() {
     currentLang = document.getElementById('lang').value;
     const t = i18n[currentLang] || i18n['en'];
-    
+
     document.getElementById('flag_en').classList.toggle('active', currentLang === 'en');
     document.getElementById('flag_fr').classList.toggle('active', currentLang === 'fr');
-    
+
     const standardElements = [
-        'tabPrefs', 'tabData', 'tabHelp', 'tabView', 'resetDesc', 'format', 
-        'optUnits', 'optStacks', 'targetMetalLabel', 'target', 'crafters', 
-        'yieldMods', 'mastery', 'refining', 'extraction', 'btnDiscord', 'btnSend', 
-        'invBank', 'invBankTitle', 'showAllBank', 'btnReset', 'defGather', 'mfgPipe', 'marketCart', 'marketCartTitle', 'showAllCart', 'btnAutoFill', 
+        'tabPrefs', 'tabData', 'tabHelp', 'tabView', 'resetDesc', 'format',
+        'optUnits', 'optStacks', 'targetMetalLabel', 'target', 'crafters',
+        'yieldMods', 'mastery', 'refining', 'extraction', 'btnDiscord', 'btnSend',
+        'invBank', 'invBankTitle', 'showAllBank', 'btnReset', 'defGather', 'mfgPipe', 'marketCart', 'marketCartTitle', 'showAllCart', 'btnAutoFill',
         'shareTitle', 'shareDesc', 'btnGenCode', 'btnLoadCode', 'helpFeatures', 'helpHowTo',
-        'colorAccent', 'colorBg', 'colorText', 'btnResetColors', 'viewProd', 
+        'colorAccent', 'colorBg', 'colorText', 'btnResetColors', 'viewProd',
         'viewGather', 'viewPipe', 'legCP', 'legSP',
-        'legBO', 'legPI', 'legGS', 'legStk', 'btnBank', 'btnCart', 
+        'legBO', 'legPI', 'legGS', 'legStk', 'btnBank', 'btnCart',
         'btnSettings', 'btnHelp', 'btnClearCart', 'viewLang',
         'actDiscord', 'viewPers', 'viewVis', 'tabGuide', 'tabLegend',
         'btnProd', 'prodCmdTitle', 'btnExportCSV', 'bpTitle', 'btnBp', 'btnPrefEfficient', 'btnPrefYield', 'projectProgressText',
-        'btnPipeReset'
+        'btnPipeReset', 'lblEfficient', 'lblMaxYield', 'lblRegionLocked', 'btnMaxText', 'chkBp', 'btnPrefs', 'yieldModsModal', 'maxTitle', 'maxAcknowledge',
+        'legAcronyms', 'legEff', 'legYld', 'legReg'
     ];
-    
+
     const htmlElements = [
         'helpSubtitle', 'helpFeat1', 'helpFeat3', 'helpFeat4', 'helpFeat5',
-        'helpHow1', 'helpHow2', 'helpHow3', 'helpHow4',
-        'legBestTxt', 'legMaxTxt', 'legRegionTxt'
+        'helpHow1', 'helpHow2', 'helpHow3', 'helpHow4'
     ];
 
     standardElements.forEach(id => {
@@ -128,15 +120,17 @@ function changeLang() {
         if (el) el.innerHTML = t[id] || i18n.en[id];
     });
 
-    // Update search placeholders dynamically
-    const searchBank = document.getElementById('searchBank');
-    if(searchBank) searchBank.placeholder = t.searchPlaceholder || "Search...";
-    
-    const searchCart = document.getElementById('searchCart');
-    if(searchCart) searchCart.placeholder = t.searchPlaceholder || "Search...";
+    document.querySelectorAll('.tooltip-maxcraft').forEach(el => el.title = t.tooltipMaxCraft || "Calculate how much you can make with just your inventory");
+    document.querySelectorAll('.tooltip-showall').forEach(el => el.title = t.tooltipShowAll || "Show items not strictly related to the target metal");
 
-    renderBankTable(); 
-    renderMarketTable(); 
+    const searchBank = document.getElementById('searchBank');
+    if (searchBank) searchBank.placeholder = t.searchPlaceholder || "Search...";
+
+    const searchCart = document.getElementById('searchCart');
+    if (searchCart) searchCart.placeholder = t.searchPlaceholder || "Search...";
+
+    renderBankTable();
+    renderMarketTable();
     updatePipelineVisuals();
     run();
 }

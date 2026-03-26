@@ -1,30 +1,31 @@
 const rawKeys = ['granum', 'calx', 'saburra', 'tephra', 'gabore', 'kimurite', 'bor', 'rockoil', 'dragonsalt', 'ichor', 'sulfur', 'tallow'];
 
-const defaultPrices = { 
-    granum: 15, calx: 18, saburra: 15, tephra: 40, gabore: 25, kimurite: 200, 
+const defaultPrices = {
+    granum: 15, calx: 18, saburra: 15, tephra: 40, gabore: 25, kimurite: 200,
     bor: 12, rockoil: 15, dragonsalt: 18, ichor: 15, sulfur: 12, tallow: 10,
     coal: 15, coke: 18, water: 10, sp: 15, cp: 20, fumingsalt: 15
 };
 
 const GATHERABLE_STONES = ['granum', 'calx', 'saburra', 'tephra', 'gabore', 'kimurite', 'lodestone', 'water'];
 
+// Items have been sorted alphabetically by their UI Display Names
 const CATEGORIES = [
-    { id: 'raw', items: ['granum', 'calx', 'saburra', 'tephra', 'gabore', 'kimurite', 'lodestone', 'water'] },
-    { id: 'catalyst', items: ['coal', 'coke', 'sp', 'cp', 'fumingsalt', 'bor', 'rockoil', 'dragonsalt', 'ichor', 'sulfur', 'tallow'] },
-    { id: 'basicExt', items: ['granumpowder', 'gaborepowder', 'malachite', 'bleckblende', 'calamine', 'amarantum', 'flakestone', 'calspar', 'jadeite', 'pyrite', 'magmum'] },
-    { id: 'intOre', items: ['bo', 'galbinum', 'pyroxene', 'redbleckblende', 'bleck', 'cinnabar', 'maalite', 'pyropite', 'kyanite', 'aabam'] },
-    { id: 'advOre', items: ['lupium', 'almine', 'acronite', 'sanguinite', 'gemmetal', 'skadite', 'chalkglance', 'waterstone'] },
-    { id: 'refined', items: ['pi', 'cuprum', 'gs', 'steel', 'bron', 'messing', 'tmessing', 'tungsteel', 'cronite', 'oghmium', 'gold', 'silver', 'electrum'] }
+    { id: 'raw', items: ['calx', 'gabore', 'granum', 'kimurite', 'lodestone', 'saburra', 'tephra', 'water'] },
+    { id: 'catalyst', items: ['bor', 'cp', 'coal', 'coke', 'dragonsalt', 'fumingsalt', 'ichor', 'rockoil', 'sp', 'sulfur', 'tallow'] },
+    { id: 'basicExt', items: ['amarantum', 'bleckblende', 'calamine', 'calspar', 'flakestone', 'gaborepowder', 'granumpowder', 'jadeite', 'magmum', 'malachite', 'pyrite'] },
+    { id: 'intOre', items: ['aabam', 'bleck', 'bo', 'cinnabar', 'galbinum', 'kyanite', 'maalite', 'pyropite', 'pyroxene', 'redbleckblende'] },
+    { id: 'advOre', items: ['acronite', 'almine', 'chalkglance', 'gemmetal', 'lupium', 'sanguinite', 'skadite', 'waterstone'] },
+    { id: 'refined', items: ['bron', 'cronite', 'cuprum', 'electrum', 'gold', 'gs', 'messing', 'oghmium', 'pi', 'silver', 'steel', 'tmessing', 'tungsteel'] }
 ];
 
 const EXTRACT_MAP = {
     skadite: 'chalkglance', electrum: 'amarantum', gemmetal: 'waterstone', sanguinite: 'redbleckblende',
     almine: 'pyroxene', acronite: 'pyroxene', lupium: 'galbinum',
     pyroxene: 'galbinum', galbinum: 'tephra', redbleckblende: 'tephra',
-    bo: 'granum', maalite: 'magmum', pyropite: 'magmum', kyanite: 'magmum', aabam: 'redbleckblende', calamine: 'amarantum', 
+    bo: 'granum', maalite: 'magmum', pyropite: 'magmum', kyanite: 'magmum', aabam: 'redbleckblende', calamine: 'amarantum',
     silver: 'electrum', chalkglance: 'calspar', cuprum: 'malachite', pi: 'bo', coke: 'coal', pitch: 'coal', ichor: 'cinnabar', sulfur: 'cinnabar',
     bleck: 'bleckblende', bleckblende: 'saburra', jadeite: 'saburra', malachite: 'saburra', sp: 'saburra',
-    granumpowder: 'granum', amarantum: 'granum', flakestone: 'granum', calspar: 'calx', coal: 'calx', 
+    granumpowder: 'granum', amarantum: 'granum', flakestone: 'granum', calspar: 'calx', coal: 'calx',
     cp: 'calx', cinnabar: 'tephra', magmum: 'tephra', volcanicash: 'tephra', pyrite: 'saburra',
     gaborepowder: 'gabore', lodestonepowder: 'lodestone', ritualash: 'risensacrificecarcass', gold: 'electrum', waterstone: 'kimurite'
 };
@@ -33,16 +34,16 @@ const RECIPES = {
     oghmium: { "Alloy": { type: 'alloy', primary: 'tungsteel', cat1: 'cronite', cat2: 'sanguinite' } },
     tungsteel: { "Alloy": { type: 'alloy', primary: 'gs', cat1: 'lupium', cat2: 'granumpowder' } },
     cronite: { "Alloy": { type: 'alloy', primary: 'gs', cat1: 'almine', cat2: 'acronite' } },
-    steel: { 
+    steel: {
         "Alloy (Coal)": { type: 'alloy', primary: 'gs', cat1: 'coal', cat2: 'sp' },
         "Alloy (Coke)": { type: 'alloy', primary: 'gs', cat1: 'coke', cat2: 'sp' }
     },
-    gs: { 
+    gs: {
         "Alloy (Coke)": { type: 'alloy', primary: 'pi', cat1: 'cp', cat2: 'coke' },
         "Alloy (Coal)": { type: 'alloy', primary: 'pi', cat1: 'cp', cat2: 'coal' }
     },
     tmessing: { "Alloy": { type: 'alloy', primary: 'messing', cat1: 'almine', cat2: 'gemmetal' } },
-    messing: { 
+    messing: {
         "Alloy (Calamine)": { type: 'alloy', primary: 'cuprum', cat1: 'calamine', cat2: 'sp' },
         "Alloy (Bor)": { type: 'alloy', primary: 'cuprum', cat1: 'bor', cat2: 'sp' }
     },

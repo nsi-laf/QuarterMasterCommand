@@ -108,21 +108,21 @@ function renderMarketTable() {
 
             tiers.forEach((tier, idx) => {
                 let addRemoveBtn = idx > 0 ?
-                    `<button class="btn-clear btn-sq" style="margin: 0; padding: 0; font-size:14px;" title="Remove Tier" onclick="removeMarketTier('${k}', ${idx})">-</button>` :
-                    `<button class="btn-success btn-sq" style="margin: 0; padding: 0; font-size:14px;" title="Add Tier" onclick="addMarketTier('${k}')">+</button>`;
+                    `<button class="btn-warning btn-sq" style="margin: 0; padding: 0; font-size:14px;" title="Remove Tier" onclick="removeMarketTier('${k}', ${idx})">-</button>` :
+                    `<button class="btn-accent btn-sq" style="margin: 0; padding: 0; font-size:14px; color:#000;" title="Add Tier" onclick="addMarketTier('${k}')">+</button>`;
 
                 tiersHtml += `
                     <div class="market-tier-row">
                         <div style="display: flex; align-items: center; gap: 8px; min-width: 130px;">
-                            <span style="color:var(--text-dim); font-size:11px; font-weight:bold; white-space: nowrap;">↳ Order ${idx + 1}</span>
+                            <span style="color:var(--text-dim); font-size:11px; font-weight:bold; white-space: nowrap;">↳ ${t.tblOrder || 'Order'} ${idx + 1}</span>
                             <input type="number" style="width: 55px; margin: 0;" value="${tier.p}" title="Price" max="999" oninput="updateMarketTier('${k}', ${idx}, 'p', this.value)"> 
                         </div>
                         <div style="display:flex; gap: 4px; align-items: center; flex-wrap: wrap;">
                             <button class="btn-stack q-sub" style="margin: 0; min-width:30px; padding:0 4px;" onclick="quickSubMarket('${k}', ${idx})">${subLabel}</button>
                             <input type="number" style="width: 95px; margin: 0;" value="${tier.q}" title="Qty" oninput="updateMarketTier('${k}', ${idx}, 'q', this.value)">
                             <button class="btn-stack q-add" style="margin: 0; min-width:30px; padding:0 4px;" onclick="quickAddMarket('${k}', ${idx})">${addLabel}</button>
-                            <button class="btn-cart btn-success" style="margin: 0; padding: 0 8px;" title="Auto-Fill Missing" onclick="autoFillMarketItem('${k}')">Fill</button>
-                            <button class="btn-clear" style="margin: 0; padding: 0 8px;" title="Clear Qty" onclick="clearMarketTier('${k}', ${idx})">Clear</button>
+                            <button class="btn-cart btn-success" style="margin: 0; padding: 0 8px;" title="Auto-Fill Missing" onclick="autoFillMarketItem('${k}')">${t.btnAutoFill || 'Fill'}</button>
+                            <button class="btn-clear" style="margin: 0; padding: 0 8px;" title="Clear Qty" onclick="clearMarketTier('${k}', ${idx})">${t.btnClearCart || 'Clear'}</button>
                             ${addRemoveBtn}
                         </div>
                     </div>`;
@@ -132,7 +132,7 @@ function renderMarketTable() {
 
             html += `<div class="market-card" id="row_m_${k}" style="display:none;">
                 <div class="market-card-header">
-                    <div style="font-weight:bold; color:var(--accent); font-size: 1.1em;">${itemName}</div>
+                    <div style="font-weight:bold; color:var(--text); font-size: 1.1em;">${itemName}</div>
                     <div style="display: flex; gap: 15px; text-align: right;">
                         <div><span style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">${t.tblCost || 'Cost'}</span> <br><span style="font-weight:bold; color:var(--accent); font-size: 1.1em;" id="cost_${k}">0.00</span></div>
                         <div><span style="font-size: 10px; color: var(--text-dim); text-transform: uppercase;">${t.tblStash || 'Stash'}</span> <br><span style="color:var(--text-dim);" id="stash_${k}">0</span></div>
@@ -168,13 +168,13 @@ function renderBankTable() {
             let itemName = (t.items && t.items[k]) ? t.items[k] : (k.charAt(0).toUpperCase() + k.slice(1));
 
             html += `<div class="bank-row" id="row_b_${k}" style="display:none;">
-                <div style="font-weight:bold; color:var(--accent);">${itemName}</div>
+                <div style="font-weight:bold; color:var(--text);">${itemName}</div>
                 <div style="text-align:right;">
                     <div style="display:flex; gap: 4px; justify-content: flex-end; align-items:center; flex-wrap: wrap;">
                         <button class="btn-stack q-sub" style="margin: 0; min-width:30px; padding:0 4px;" onclick="quickSub('b_${k}')">${subLabel}</button>
                         <input type="number" id="b_${k}" value="${val}" oninput="handlePipelineChange()" style="width: 95px; margin: 0;">
                         <button class="btn-stack q-add" style="margin: 0; min-width:30px; padding:0 4px;" onclick="quickAdd('b_${k}')">${addLabel}</button>
-                        <button class="btn-clear" style="margin: 0; padding: 0 8px;" title="Clear Qty" onclick="clearItem('b_${k}')">Clear</button>
+                        <button class="btn-clear" style="margin: 0; padding: 0 8px;" title="Clear Qty" onclick="clearItem('b_${k}')">${t.btnClearCart || 'Clear'}</button>
                     </div>
                 </div>
             </div>`;
@@ -202,11 +202,18 @@ function updateVisibility(targetMetal) {
             let matchBankSearch = searchBank === "" || itemName.includes(searchBank);
             let matchCartSearch = searchCart === "" || itemName.includes(searchCart);
 
+            let isActive = window.activeResources && window.activeResources.has(k);
+
             const rowB = document.getElementById('row_b_' + k);
             if (rowB) {
-                let shouldShow = (showAllBank || relevant.has(k)) && matchBankSearch;
-                if (k === targetMetal && !showAllBank) shouldShow = false;
-                if (searchBank !== "" && matchBankSearch) shouldShow = true;
+                let shouldShow = false;
+                if (searchBank !== "") {
+                    shouldShow = matchBankSearch;
+                } else {
+                    shouldShow = (showAllBank || relevant.has(k) || isActive);
+                    // Hide the target metal explicitly unless "Show All" is checked
+                    if (!showAllBank && k === targetMetal) shouldShow = false;
+                }
 
                 rowB.style.display = shouldShow ? 'grid' : 'none';
                 if (shouldShow) catHasVisibleBank = true;
@@ -214,11 +221,16 @@ function updateVisibility(targetMetal) {
 
             const rowM = document.getElementById('row_m_' + k);
             if (rowM) {
-                let shouldShow = (showAllCart || relevant.has(k)) && matchCartSearch;
-                if (k === targetMetal && !showAllCart) shouldShow = false;
-                if (searchCart !== "" && matchCartSearch) shouldShow = true;
+                let shouldShow = false;
+                if (searchCart !== "") {
+                    shouldShow = matchCartSearch;
+                } else {
+                    shouldShow = (showAllCart || relevant.has(k) || isActive);
+                    // Hide the target metal explicitly unless "Show All" is checked
+                    if (!showAllCart && k === targetMetal) shouldShow = false;
+                }
 
-                rowM.style.display = shouldShow ? 'grid' : 'none';
+                rowM.style.display = shouldShow ? 'block' : 'none';
                 if (shouldShow) catHasVisibleMarket = true;
             }
         });

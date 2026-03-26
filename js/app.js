@@ -38,11 +38,9 @@ function targetMetalChanged() {
 
 function run() { clearTimeout(timer); timer = setTimeout(calculate, 150); }
 
-function switchHelpTab(tab) {
-    document.getElementById('tabBtn_help').classList.toggle('active', tab === 'help');
-    document.getElementById('tabBtn_legend').classList.toggle('active', tab === 'legend');
-    document.getElementById('tab_help').style.display = tab === 'help' ? 'block' : 'none';
-    document.getElementById('tab_legend').style.display = tab === 'legend' ? 'block' : 'none';
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
 }
 
 function calculateMax() {
@@ -71,9 +69,9 @@ function calculateMax() {
     let origExts = resolveExtractions(origTree.deficits, mE, mM, bank);
 
     let origMissing = { ...origExts.raw };
-    if (origTree.deficits) {
-        Object.keys(origTree.deficits).forEach(k => {
-            origMissing[k] = (origMissing[k] || 0) + origTree.deficits[k];
+    if (origTree.intermediates) {
+        Object.keys(origTree.intermediates).forEach(k => {
+            origMissing[k] = (origMissing[k] || 0) + origTree.intermediates[k];
         });
     }
 
@@ -85,15 +83,8 @@ function calculateMax() {
         let mid = Math.floor((low + high) / 2);
         let tree = resolveTree(targetMetal, mid, bank, mR);
         let exts = resolveExtractions(tree.deficits, mE, mM, bank);
-
         let hasDeficit = Object.values(exts.raw).some(v => v > 0);
-
-        if (!hasDeficit) {
-            best = mid;
-            low = mid + 1;
-        } else {
-            high = mid - 1;
-        }
+        if (!hasDeficit) { best = mid; low = mid + 1; } else { high = mid - 1; }
     }
 
     let targetName = (t.items && t.items[targetMetal]) ? t.items[targetMetal] : targetMetal;
@@ -102,16 +93,22 @@ function calculateMax() {
 
     let bodyHtml = '';
 
+    document.getElementById('ui_maxTitle').innerText = t.maxTitle;
+    const acknowledgeBtn = document.getElementById('ui_maxAcknowledge');
+    if (acknowledgeBtn) acknowledgeBtn.innerText = t.maxAcknowledge;
+
     if (best > 0) {
-        bodyHtml += `<p style="color:var(--text-dim); margin-top:0;">You have enough materials to craft <strong style="color:var(--accent); font-size:1.1em;">${bestFmt} ${targetName}</strong>.</p>`;
+        bodyHtml += `<p style="color:var(--text-dim); margin-top:0;">${t.maxTotalCraft} <strong style="color:var(--accent); font-size:1.1em;">${bestFmt} ${targetName}</strong>.</p>`;
     } else {
-        bodyHtml += `<p style="color:var(--danger); font-weight:bold; margin-top:0;">Cannot craft any ${targetName} with your current bank.</p>`;
+        let craftAnyMsg = t.maxCraftAny.replace('[item]', targetName);
+        bodyHtml += `<p style="color:var(--danger); font-weight:bold; margin-top:0;">${craftAnyMsg}</p>`;
     }
 
     let hasMissing = Object.values(origMissing).some(v => v > 0);
 
     if (best < targetUnits && hasMissing) {
-        bodyHtml += `<p style="margin-bottom: 15px; border-top: 1px dashed var(--border); padding-top: 15px;">To reach your original target of <strong>${fmtOrig} ${targetName}</strong>, you are still missing:</p>`;
+        let missingMsg = t.maxMissing.replace('[target]', `${fmtOrig} ${targetName}`);
+        bodyHtml += `<p style="margin-bottom: 15px; border-top: 1px dashed var(--border); padding-top: 15px;">${missingMsg}</p>`;
 
         CATEGORIES.forEach(cat => {
             let catItems = [];
@@ -133,7 +130,7 @@ function calculateMax() {
             }
         });
     } else if (best >= targetUnits) {
-        bodyHtml += `<p style="color:var(--success); font-weight:bold; margin-top: 15px;">You have everything you need to meet your goal!</p>`;
+        bodyHtml += `<p style="color:var(--success); font-weight:bold; margin-top: 15px;">${t.maxCalculatedGoal}</p>`;
     }
 
     document.getElementById('maxCraftBody').innerHTML = bodyHtml;
@@ -146,6 +143,26 @@ function calculateMax() {
     }
 }
 
+function toggleGlobalPref(prefType, isChecked) {
+    if (typeof clearPipelineProgress === "function") clearPipelineProgress();
+
+    if (isChecked) {
+        globalRoutePref = prefType;
+        if (prefType === 'efficient') {
+            document.getElementById('chkYld').checked = false;
+        } else if (prefType === 'yield') {
+            document.getElementById('chkEff').checked = false;
+        }
+    } else {
+        if (globalRoutePref === prefType) {
+            globalRoutePref = null;
+        }
+    }
+
+    save();
+    run();
+}
+
 function calculate() {
     const mode = document.getElementById('mode').value;
     const t = i18n[currentLang] || i18n['en'];
@@ -153,6 +170,9 @@ function calculate() {
     const crafters = Math.max(1, Number(document.getElementById('crafters').value));
     const targetMetal = document.getElementById('targetMetal').value;
     const mult = mode === 'stacks' ? 10000 : 1;
+
+    const chkBp = document.getElementById('chkBp');
+    const showBp = chkBp ? chkBp.checked : false;
 
     if (targetRaw <= 0) {
         document.getElementById('gatherOutput').innerHTML = `<div class="empty-msg">${t.noTarget || 'No target set.'}</div>`;
@@ -163,6 +183,12 @@ function calculate() {
 
         document.getElementById('row_chkBp').style.display = 'none';
         document.getElementById('bpContainer').style.display = 'none';
+        if (document.getElementById('gatherProgressBar')) document.getElementById('gatherProgressBar').style.width = '0%';
+        if (document.getElementById('projectProgressBar')) document.getElementById('projectProgressBar').style.width = '0%';
+        if (document.getElementById('projectProgressText')) {
+            document.getElementById('projectProgressText').innerText = "0%";
+            document.getElementById('projectProgressText').style.color = "var(--text)";
+        }
 
         Object.values(CATEGORIES).flatMap(c => c.items).forEach(k => {
             if (document.getElementById('cost_' + k)) document.getElementById('cost_' + k).innerText = "0.00";
@@ -215,11 +241,6 @@ function calculate() {
     const baseExtractions = resolveExtractions(baseTree.deficits, mE, mM, bank);
 
     pureDeficits = { ...baseExtractions.raw };
-    if (baseTree.deficits) {
-        Object.keys(baseTree.deficits).forEach(k => {
-            pureDeficits[k] = (pureDeficits[k] || 0) + baseTree.deficits[k];
-        });
-    }
 
     const virtualBank = {};
     Object.keys(bank).forEach(k => virtualBank[k] = bank[k] + purchased[k]);
@@ -228,9 +249,14 @@ function calculate() {
     const actualExtractions = resolveExtractions(actualTree.deficits, mE, mM, virtualBank);
 
     const finalDeficits = { ...actualExtractions.raw };
-    if (actualTree.deficits) {
-        Object.keys(actualTree.deficits).forEach(k => {
-            finalDeficits[k] = (finalDeficits[k] || 0) + actualTree.deficits[k];
+    if (actualTree.intermediates) {
+        Object.keys(actualTree.intermediates).forEach(k => {
+            finalDeficits[k] = (finalDeficits[k] || 0) + actualTree.intermediates[k];
+        });
+    }
+    if (actualExtractions.extracted) {
+        Object.keys(actualExtractions.extracted).forEach(k => {
+            finalDeficits[k] = (finalDeficits[k] || 0) + actualExtractions.extracted[k];
         });
     }
 
@@ -243,22 +269,47 @@ function calculate() {
 
     byproductsRaw = actualExtractions.bp;
 
+    window.activeResources = new Set();
+    Object.keys(baseGross).forEach(k => window.activeResources.add(k));
+    if (actualTree.intermediates) Object.keys(actualTree.intermediates).forEach(k => window.activeResources.add(k));
+    if (actualExtractions.extracted) Object.keys(actualExtractions.extracted).forEach(k => window.activeResources.add(k));
+
     let gHTML = '';
     let totalGatherUnits = 0;
+    let totalAcquiredUnits = 0;
+    let totalNeededUnits = 0;
 
     CATEGORIES.forEach(cat => {
         let catHtml = '';
         cat.items.forEach(k => {
-            if (finalDeficits[k] > 0) {
-                totalGatherUnits += finalDeficits[k];
+            if (finalDeficits[k] > 0 && k !== targetMetal) {
+                if (actualExtractions.raw[k]) {
+                    totalGatherUnits += actualExtractions.raw[k];
+                }
+
                 const fmtVal = mode === 'stacks' ? (finalDeficits[k] / 10000).toFixed(2) + " Stk" : finalDeficits[k].toLocaleString();
 
-                let totalNeeded = baseGross[k] || finalDeficits[k];
+                let totalNeeded = (baseGross[k] || 0) + (actualTree.intermediates ? (actualTree.intermediates[k] || 0) : 0) + (actualExtractions.extracted ? (actualExtractions.extracted[k] || 0) : 0);
+                if (totalNeeded < finalDeficits[k]) totalNeeded = finalDeficits[k];
+
                 let amountAcquired = totalNeeded - finalDeficits[k];
                 let progressPct = totalNeeded > 0 ? Math.min(100, Math.max(0, (amountAcquired / totalNeeded) * 100)) : 0;
 
+                totalAcquiredUnits += amountAcquired;
+                totalNeededUnits += totalNeeded;
+
+                let hue = Math.floor((progressPct / 100) * 120);
+                let colorStr = `hsl(${hue}, 80%, 50%)`;
+
                 let itemName = (t.items && t.items[k]) ? t.items[k] : (k.charAt(0).toUpperCase() + k.slice(1));
-                catHtml += `<div class="logistics-item ${finalDeficits[k] < 10000 ? 'hm-low' : 'hm-high'}" style="--prog: ${progressPct}%;"><span>${itemName}</span><span>${fmtVal}</span></div>`;
+
+                catHtml += `<div class="logistics-item" style="border-left-color: ${colorStr}; --prog: ${progressPct}%; --hue: ${hue};">
+                    <span style="font-weight:bold; color:var(--text);">${itemName}</span>
+                    <div style="display: flex; align-items: center; justify-content: flex-end;">
+                        <span style="color:var(--text-dim); font-weight:normal; margin-right: 12px; text-align: right;">${fmtVal}</span>
+                        <span style="color:${colorStr}; font-weight: bold; text-align: right; min-width: 40px;">${progressPct.toFixed(0)}%</span>
+                    </div>
+                </div>`;
             }
         });
         if (catHtml !== '') {
@@ -269,6 +320,13 @@ function calculate() {
 
     document.getElementById('gatherOutput').innerHTML = totalGatherUnits > 0 ? gHTML : `<div class="empty-msg">${t.allCovered || 'All covered!'}</div>`;
     document.getElementById('statStacks').innerText = (totalGatherUnits / 10000).toFixed(2);
+
+    let gatherOverallPct = totalNeededUnits > 0 ? (totalAcquiredUnits / totalNeededUnits) * 100 : 100;
+    if (document.getElementById('gatherProgressBar')) {
+        let hueBar = Math.floor((gatherOverallPct / 100) * 120);
+        document.getElementById('gatherProgressBar').style.width = gatherOverallPct + '%';
+        document.getElementById('gatherProgressBar').style.backgroundColor = `hsl(${hueBar}, 70%, 50%)`;
+    }
 
     let newPipeline = [...actualExtractions.extSteps, ...actualTree.steps];
 
@@ -295,29 +353,34 @@ function calculate() {
             return `<span class="highlight">${y.amount.toLocaleString()} ${yName}</span>`;
         }).join(', ') : "";
 
-        let bpYieldsStr = (stepObj.byproducts && stepObj.byproducts.length > 0) ? stepObj.byproducts.map(y => {
-            let yName = (t.items && t.items[y.item]) ? t.items[y.item] : (y.item.charAt(0).toUpperCase() + y.item.slice(1));
-            return `${y.amount.toLocaleString()} ${yName}`;
-        }).join(', ') : "None";
+        let bpHtml = "";
+        if (showBp) {
+            let bpYieldsStr = (stepObj.byproducts && stepObj.byproducts.length > 0) ? stepObj.byproducts.map(y => {
+                let yName = (t.items && t.items[y.item]) ? t.items[y.item] : (y.item.charAt(0).toUpperCase() + y.item.slice(1));
+                return `${y.amount.toLocaleString()} ${yName}`;
+            }).join(', ') : (t.none || "None");
+            bpHtml = `<br><span style="color:var(--text-dim); font-weight:bold;">${t.stepByproducts || 'Byproducts:'}</span> <span style="color:var(--text-dim);">${bpYieldsStr}</span>`;
+        }
 
         let routeHtml = '';
         if (stepObj.routeStats && stepObj.routeStats.length > 1) {
             let btns = stepObj.routeStats.map(rs => {
                 let classes = ['btn-route'];
-                let textBadges = [];
+                let badges = [];
 
                 if (rs.name === stepObj.selectedRoute) classes.push('active');
-                if (rs.isBestYield) { classes.push('rt-eff'); textBadges.push('[E]'); }
-                if (rs.isMaxYield) { classes.push('rt-max'); textBadges.push('[Y]'); }
-                if (rs.isRegionLocked) { classes.push('rt-reg'); textBadges.push('[R]'); }
 
-                // Add the badges neatly with a space joining them if there are multiple.
-                let badgeHtml = textBadges.length > 0 ? ` <span style="font-size:10px; opacity:0.8; margin-left: 4px;">${textBadges.join(' ')}</span>` : '';
+                // New logic: Applies acronym box completely separated from the machine's text name wrapper
+                if (rs.isBestYield) { classes.push('rt-eff'); badges.push('<span class="acronym-box acronym-eff">E</span>'); }
+                if (rs.isMaxYield) { classes.push('rt-max'); badges.push('<span class="acronym-box acronym-max">Y</span>'); }
+                if (rs.isRegionLocked) { classes.push('rt-reg'); badges.push('<span class="acronym-box acronym-reg">R</span>'); }
+
+                let badgeHtml = badges.length > 0 ? `<span style="margin-left:8px; display:inline-flex; gap:4px;">${badges.join('')}</span>` : '';
 
                 let safeStepKey = stepObj.stepKey.replace(/'/g, "\\'");
                 let safeRouteName = rs.name.replace(/'/g, "\\'");
 
-                return `<button class="${classes.join(' ')}" onclick="updatePathChoice(event, '${safeStepKey}', '${safeRouteName}')">${rs.name}${badgeHtml}</button>`;
+                return `<button class="${classes.join(' ')}" onclick="updatePathChoice(event, '${safeStepKey}', '${safeRouteName}')"><span>${rs.name}</span>${badgeHtml}</button>`;
             }).join('');
             routeHtml = `<div class="route-choices">${btns}</div>`;
         }
@@ -327,12 +390,9 @@ function calculate() {
                 <span style="cursor:pointer; margin-right:8px; font-size: 1.1em; font-weight: bold;">${checkIcon}</span>
                 <span style="color:var(--text-dim); font-weight:bold; margin-right:5px;">${t.stepPrefix || 'Step'} ${index + 1}.</span>${modAction}${perCr}
             </div>
-            
             <div style="margin-top: 6px; font-size: 11px; padding-left: 28px;">
-                <span style="color:var(--success); font-weight:bold;">${t.stepYieldsMain || 'Yields:'}</span> ${mainYieldsStr}<br>
-                <span style="color:var(--text-dim); font-weight:bold;">${t.stepByproducts || 'Byproducts:'}</span> <span style="color:var(--text-dim);">${bpYieldsStr}</span>
+                <span style="color:var(--success); font-weight:bold;">${t.stepYieldsMain || 'Yields:'}</span> ${mainYieldsStr}${bpHtml}
             </div>
-
             <div style="padding-left: 28px;">${routeHtml}</div>
         </div>`;
     }).join('');
@@ -348,18 +408,14 @@ function calculate() {
         }
     });
 
-    const chkBp = document.getElementById('chkBp');
     if (byproductsString !== "") {
-        document.getElementById('row_chkBp').style.display = 'flex';
         document.getElementById('bpOutput').innerHTML = byproductsString;
-
-        if (chkBp && chkBp.checked) {
+        if (showBp) {
             document.getElementById('bpContainer').style.display = 'block';
         } else {
             document.getElementById('bpContainer').style.display = 'none';
         }
     } else {
-        document.getElementById('row_chkBp').style.display = 'none';
         document.getElementById('bpContainer').style.display = 'none';
     }
 
@@ -372,71 +428,12 @@ function calculate() {
     save();
 }
 
-function exportToCSV() {
-    const t = i18n[currentLang] || i18n['en'];
-    const mode = document.getElementById('mode').value;
-    const targetMetal = document.getElementById('targetMetal').value;
-    const targetVal = document.getElementById('targetAmount').value;
-
-    let csv = `Quartermaster Command Logistics Order\nTarget:,${t.items[targetMetal] || targetMetal},Amount:,${targetVal} ${mode === 'stacks' ? 'Stacks' : 'Units'}\n\n`;
-    csv += "Item,Inventory Stock,Market Cart Buy,Deficit to Gather\n";
-
-    const relevant = getRelevantItems(targetMetal);
-
-    Object.values(CATEGORIES).flatMap(c => c.items).forEach(k => {
-        if (relevant.has(k) || pureDeficits[k]) {
-            let b = Number(document.getElementById('b_' + k)?.value) || 0;
-            let cQty = 0;
-            if (marketData[k]) marketData[k].forEach(tier => cQty += tier.q);
-            let d = pureDeficits[k] || 0;
-
-            if (b > 0 || cQty > 0 || d > 0) {
-                let itemName = (t.items && t.items[k]) ? t.items[k] : k;
-                let fmtB = mode === 'stacks' ? b : b;
-                let fmtC = mode === 'stacks' ? cQty : cQty;
-                let fmtD = mode === 'stacks' ? (d / 10000).toFixed(2) : d;
-                csv += `"${itemName}",${fmtB},${fmtC},${fmtD}\n`;
-            }
-        }
-    });
-
-    csv += "\nPipeline Steps\n";
-    pipelineStepsRaw.forEach((stepObj, index) => {
-        let textAction = stepObj.htmlAction.replace(/<[^>]*>?/gm, '');
-        csv += `${index + 1},"${textAction}"\n`;
-    });
-
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", "quartermaster_order.csv");
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    showToast(t.exportSuccess || "Exported to CSV!");
-}
-
-function toggleBpTabBox() {
-    const chkBp = document.getElementById('chkBp');
-    const isChecked = chkBp ? chkBp.checked : false;
-    const el = document.getElementById('bpContainer');
-    if (isChecked) {
-        el.style.display = 'block';
-        setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
-    } else {
-        el.style.display = 'none';
-    }
-}
-
 window.onload = () => {
     initMarketData();
-    renderBankTable();
-    renderMarketTable();
     load();
     document.getElementById('lang').value = currentLang;
     changeLang();
-    targetMetalChanged();
+    syncColorPickers();
+    syncThemeSwitch();
+    calculate();
 };
